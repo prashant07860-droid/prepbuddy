@@ -46,13 +46,24 @@ export default function HomeScreen() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('/api/subjects');
+      console.log('Fetching subjects...');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      
+      const response = await fetch('/api/subjects', {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      
+      console.log('Response status:', response.status);
       if (!response.ok) {
-        throw new Error('Failed to fetch subjects');
+        throw new Error(`Failed to fetch subjects: ${response.status}`);
       }
       const data = await response.json();
+      console.log('Received data:', data.length, 'subjects');
       setSubjects(data);
     } catch (err) {
+      console.error('Error fetching:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
