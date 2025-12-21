@@ -50,7 +50,9 @@ export default function HomeScreen() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
       
-      const response = await fetch('/api/subjects', {
+      // Use absolute URL
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const response = await fetch(`${baseUrl}/api/subjects`, {
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
