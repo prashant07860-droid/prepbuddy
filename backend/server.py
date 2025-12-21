@@ -334,6 +334,9 @@ async def get_subjects():
     if not subjects:
         # Return empty list if no subjects seeded yet
         return []
+    # Remove MongoDB _id field
+    for s in subjects:
+        s.pop('_id', None)
     return subjects
 
 @api_router.get("/subjects/{subject_id}")
