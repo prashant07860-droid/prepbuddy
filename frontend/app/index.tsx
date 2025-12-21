@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,18 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { fetchSubjects, Subject } from '../src/api';
+
+interface Subject {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  total_papers: number;
+  total_questions: number;
+}
 
 const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
   bank: 'bank',
@@ -30,22 +38,30 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const {
-    data: subjects,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ['subjects'],
-    queryFn: fetchSubjects,
-  });
+  const fetchSubjects = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetch('/api/subjects');
+      if (!response.ok) {
+        throw new Error('Failed to fetch subjects');
+      }
+      const data = await response.json();
+      setSubjects(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    console.log('Subjects data:', subjects);
-    console.log('Loading:', isLoading);
-    console.log('Error:', error);
-  }, [subjects, isLoading, error]);
+    fetchSubjects();
+  }, []);
 
   const renderSubjectCard = (subject: Subject) => (
     <TouchableOpacity
@@ -97,8 +113,8 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
           <MaterialCommunityIcons name="alert-circle" size={48} color="#EF4444" />
-          <Text style={styles.errorText}>Failed to load subjects</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchSubjects}>
             <Text style={styles.retryText}>Retry</Text>
           </TouchableOpacity>
         </View>
@@ -134,15 +150,15 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#3B82F6" />
+          <RefreshControl refreshing={isLoading} onRefresh={fetchSubjects} tintColor="#3B82F6" />
         }
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All Subjects</Text>
-          <Text style={styles.sectionCount}>{subjects?.length || 0} subjects</Text>
+          <Text style={styles.sectionCount}>{subjects.length} subjects</Text>
         </View>
 
-        {subjects?.map(renderSubjectCard)}
+        {subjects.map(renderSubjectCard)}
 
         <View style={styles.bottomPadding} />
       </ScrollView>
