@@ -611,10 +611,12 @@ async def get_attempt_review(attempt_id: str):
     if not attempt:
         raise HTTPException(status_code=404, detail="Attempt not found")
     
+    attempt.pop('_id', None)
     questions = await db.questions.find({"paper_id": attempt["paper_id"]}).sort("question_number", 1).to_list(200)
     
     review_data = []
     for q in questions:
+        q.pop('_id', None)
         user_answer = attempt["answers"].get(q["id"], -1)
         review_data.append({
             "question": q,
