@@ -63,9 +63,32 @@ export default function HomeScreen() {
 
   // Use useFocusEffect instead of useEffect for better SSR compatibility
   useFocusEffect(
-    useCallback(() => {
-      fetchSubjects();
-    }, [fetchSubjects])
+    React.useCallback(() => {
+      let isActive = true;
+      
+      const doFetch = async () => {
+        try {
+          const response = await fetch('/api/subjects');
+          if (!response.ok) throw new Error('Failed');
+          const data = await response.json();
+          if (isActive) {
+            setSubjects(data);
+            setIsLoading(false);
+          }
+        } catch (err) {
+          if (isActive) {
+            setError('Failed to load subjects');
+            setIsLoading(false);
+          }
+        }
+      };
+      
+      doFetch();
+      
+      return () => {
+        isActive = false;
+      };
+    }, [])
   );
 
   const renderSubjectCard = (subject: Subject) => (
