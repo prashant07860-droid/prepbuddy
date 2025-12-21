@@ -1,13 +1,4 @@
-import axios from 'axios';
-
-// Use relative URL for API calls - the proxy will handle routing
-const api = axios.create({
-  baseURL: '/api',
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// Use native fetch for API calls
 
 export interface Subject {
   id: string;
@@ -84,29 +75,37 @@ export interface UserSettings {
   show_timer: boolean;
 }
 
+const apiCall = async (endpoint: string, options?: RequestInit) => {
+  const response = await fetch(`/api${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...options,
+  });
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+  return response.json();
+};
+
 export const fetchSubjects = async (): Promise<Subject[]> => {
-  const response = await api.get('/subjects');
-  return response.data;
+  return apiCall('/subjects');
 };
 
 export const fetchSubject = async (id: string): Promise<Subject> => {
-  const response = await api.get(`/subjects/${id}`);
-  return response.data;
+  return apiCall(`/subjects/${id}`);
 };
 
 export const fetchPapers = async (subjectId: string): Promise<Paper[]> => {
-  const response = await api.get(`/subjects/${subjectId}/papers`);
-  return response.data;
+  return apiCall(`/subjects/${subjectId}/papers`);
 };
 
 export const fetchPaper = async (paperId: string): Promise<Paper> => {
-  const response = await api.get(`/papers/${paperId}`);
-  return response.data;
+  return apiCall(`/papers/${paperId}`);
 };
 
 export const fetchQuestions = async (paperId: string): Promise<Question[]> => {
-  const response = await api.get(`/papers/${paperId}/questions`);
-  return response.data;
+  return apiCall(`/papers/${paperId}/questions`);
 };
 
 export const submitAttempt = async (data: {
@@ -116,36 +115,38 @@ export const submitAttempt = async (data: {
   time_taken_seconds: number;
   timer_mode: string;
 }): Promise<Attempt> => {
-  const response = await api.post('/attempts', data);
-  return response.data;
+  return apiCall('/attempts', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 };
 
 export const fetchAttempts = async (params?: {
   subject_id?: string;
   paper_id?: string;
 }): Promise<Attempt[]> => {
-  const response = await api.get('/attempts', { params });
-  return response.data;
+  const searchParams = new URLSearchParams();
+  if (params?.subject_id) searchParams.append('subject_id', params.subject_id);
+  if (params?.paper_id) searchParams.append('paper_id', params.paper_id);
+  const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
+  return apiCall(`/attempts${query}`);
 };
 
 export const fetchAnalytics = async (): Promise<Analytics> => {
-  const response = await api.get('/analytics');
-  return response.data;
+  return apiCall('/analytics');
 };
 
 export const fetchAttemptReview = async (attemptId: string) => {
-  const response = await api.get(`/attempt/${attemptId}/review`);
-  return response.data;
+  return apiCall(`/attempt/${attemptId}/review`);
 };
 
 export const fetchSettings = async (): Promise<UserSettings> => {
-  const response = await api.get('/settings');
-  return response.data;
+  return apiCall('/settings');
 };
 
 export const updateSettings = async (settings: Partial<UserSettings>): Promise<UserSettings> => {
-  const response = await api.put('/settings', settings);
-  return response.data;
+  return apiCall('/settings', {
+    method: 'PUT',
+    body: JSON.stringify(settings),
+  });
 };
-
-export default api;
