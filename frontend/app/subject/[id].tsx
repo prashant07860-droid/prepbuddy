@@ -11,16 +11,6 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-interface Subject {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-  total_papers: number;
-  total_questions: number;
-}
-
 interface Paper {
   id: string;
   subject_id: string;
@@ -52,45 +42,44 @@ const SUBJECTS_MAP: Record<string, { name: string; color: string }> = {
   '8b5a7f40-4cec-45fb-a2c6-80bbb339a5b7': { name: 'Current Affairs', color: '#0EA5E9' },
 };
 
+// Generate initial papers data
+const generatePapers = (subjectId: string): Paper[] => {
+  const subjectName = SUBJECTS_MAP[subjectId]?.name || 'Subject';
+  const papers: Paper[] = [];
+  
+  // Generate 20 practice papers
+  for (let i = 1; i <= 20; i++) {
+    papers.push({
+      id: `${subjectId}-practice-${i}`,
+      subject_id: subjectId,
+      paper_number: i,
+      is_master: false,
+      title: `${subjectName} Practice Paper ${i}`,
+      total_questions: 100,
+      duration_minutes: 90,
+    });
+  }
+  
+  // Add master paper
+  papers.push({
+    id: `${subjectId}-master`,
+    subject_id: subjectId,
+    paper_number: 0,
+    is_master: true,
+    title: `${subjectName} Master Prediction Paper`,
+    total_questions: 100,
+    duration_minutes: 90,
+  });
+  
+  return papers;
+};
+
 export default function SubjectScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'practice' | 'master'>('practice');
   
   const subjectInfo = id ? SUBJECTS_MAP[id] : null;
-
-  // Generate initial papers data
-  const generatePapers = (subjectId: string): Paper[] => {
-    const subjectName = SUBJECTS_MAP[subjectId]?.name || 'Subject';
-    const papers: Paper[] = [];
-    
-    // Generate 20 practice papers
-    for (let i = 1; i <= 20; i++) {
-      papers.push({
-        id: `${subjectId}-practice-${i}`,
-        subject_id: subjectId,
-        paper_number: i,
-        is_master: false,
-        title: `${subjectName} Practice Paper ${i}`,
-        total_questions: 100,
-        duration_minutes: 90,
-      });
-    }
-    
-    // Add master paper
-    papers.push({
-      id: `${subjectId}-master`,
-      subject_id: subjectId,
-      paper_number: 0,
-      is_master: true,
-      title: `${subjectName} Master Prediction Paper`,
-      total_questions: 100,
-      duration_minutes: 90,
-    });
-    
-    return papers;
-  };
-
   const [papers, setPapers] = useState<Paper[]>(() => id ? generatePapers(id) : []);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -192,29 +181,24 @@ export default function SubjectScreen() {
     );
   };
 
-  if (isLoading && papers.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#F8FAFC" />
-          </TouchableOpacity>
-          <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>
-              {subjectInfo?.name || 'Loading...'}
-            </Text>
-          </View>
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#F8FAFC" />
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {subjectInfo?.name || 'Subject'}
+          </Text>
+          <Text style={styles.headerSubtitle}>
+            {practicePapers.length} Practice + {masterPaper ? '1 Master' : '0 Master'}
+          </Text>
         </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading papers...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+      </View>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
@@ -255,11 +239,7 @@ export default function SubjectScreen() {
             <Text style={styles.sectionInfo}>
               Practice with previous year questions pattern
             </Text>
-            {practicePapers.length > 0 ? (
-              practicePapers.map(renderPaperCard)
-            ) : (
-              <Text style={styles.emptyText}>No practice papers available</Text>
-            )}
+            {practicePapers.map(renderPaperCard)}
           </>
         ) : (
           <>
@@ -269,9 +249,7 @@ export default function SubjectScreen() {
                 Predicted questions based on recent trends and high-probability topics
               </Text>
             </View>
-            {masterPaper ? renderPaperCard(masterPaper) : (
-              <Text style={styles.emptyText}>No master paper available</Text>
-            )}
+            {masterPaper && renderPaperCard(masterPaper)}
           </>
         )}
       </ScrollView>
@@ -451,21 +429,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
     color: '#3B82F6',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#94A3B8',
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 20,
   },
 });
