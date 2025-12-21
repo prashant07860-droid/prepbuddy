@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -42,7 +42,7 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSubjects = async () => {
+  const fetchSubjects = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -59,11 +59,14 @@ export default function HomeScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchSubjects();
   }, []);
+
+  // Use useFocusEffect instead of useEffect for better SSR compatibility
+  useFocusEffect(
+    useCallback(() => {
+      fetchSubjects();
+    }, [fetchSubjects])
+  );
 
   const renderSubjectCard = (subject: Subject) => (
     <TouchableOpacity
@@ -99,7 +102,7 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
-  if (isLoading) {
+  if (isLoading && subjects.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -110,7 +113,7 @@ export default function HomeScreen() {
     );
   }
 
-  if (error) {
+  if (error && subjects.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
