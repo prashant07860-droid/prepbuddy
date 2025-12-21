@@ -57,12 +57,43 @@ export default function SubjectScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'practice' | 'master'>('practice');
   
-  const [subject, setSubject] = useState<Subject | null>(null);
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   const subjectInfo = id ? SUBJECTS_MAP[id] : null;
+
+  // Generate initial papers data
+  const generatePapers = (subjectId: string): Paper[] => {
+    const subjectName = SUBJECTS_MAP[subjectId]?.name || 'Subject';
+    const papers: Paper[] = [];
+    
+    // Generate 20 practice papers
+    for (let i = 1; i <= 20; i++) {
+      papers.push({
+        id: `${subjectId}-practice-${i}`,
+        subject_id: subjectId,
+        paper_number: i,
+        is_master: false,
+        title: `${subjectName} Practice Paper ${i}`,
+        total_questions: 100,
+        duration_minutes: 90,
+      });
+    }
+    
+    // Add master paper
+    papers.push({
+      id: `${subjectId}-master`,
+      subject_id: subjectId,
+      paper_number: 0,
+      is_master: true,
+      title: `${subjectName} Master Prediction Paper`,
+      total_questions: 100,
+      duration_minutes: 90,
+    });
+    
+    return papers;
+  };
+
+  const [papers, setPapers] = useState<Paper[]>(() => id ? generatePapers(id) : []);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -70,11 +101,13 @@ export default function SubjectScreen() {
     try {
       setIsLoading(true);
       
-      // Fetch papers
+      // Fetch papers from API
       const papersRes = await fetch(`/api/subjects/${id}/papers`);
       if (papersRes.ok) {
         const papersData = await papersRes.json();
-        setPapers(papersData);
+        if (papersData.length > 0) {
+          setPapers(papersData);
+        }
       }
 
       // Fetch attempts
@@ -82,13 +115,6 @@ export default function SubjectScreen() {
       if (attemptsRes.ok) {
         const attemptsData = await attemptsRes.json();
         setAttempts(attemptsData);
-      }
-
-      // Fetch subject
-      const subjectRes = await fetch(`/api/subjects/${id}`);
-      if (subjectRes.ok) {
-        const subjectData = await subjectRes.json();
-        setSubject(subjectData);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
