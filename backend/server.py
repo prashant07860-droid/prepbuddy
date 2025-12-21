@@ -345,12 +345,15 @@ async def get_subject(subject_id: str):
     subject = await db.subjects.find_one({"id": subject_id})
     if not subject:
         raise HTTPException(status_code=404, detail="Subject not found")
+    subject.pop('_id', None)
     return subject
 
 @api_router.get("/subjects/{subject_id}/papers")
 async def get_papers(subject_id: str):
     """Get all papers for a subject"""
     papers = await db.papers.find({"subject_id": subject_id}).sort("paper_number", 1).to_list(100)
+    for p in papers:
+        p.pop('_id', None)
     return papers
 
 @api_router.get("/papers/{paper_id}")
@@ -359,12 +362,15 @@ async def get_paper(paper_id: str):
     paper = await db.papers.find_one({"id": paper_id})
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found")
+    paper.pop('_id', None)
     return paper
 
 @api_router.get("/papers/{paper_id}/questions")
 async def get_questions(paper_id: str):
     """Get all questions for a paper"""
     questions = await db.questions.find({"paper_id": paper_id}).sort("question_number", 1).to_list(200)
+    for q in questions:
+        q.pop('_id', None)
     return questions
 
 @api_router.post("/attempts")
