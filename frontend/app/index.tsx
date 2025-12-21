@@ -41,6 +41,12 @@ export default function HomeScreen() {
     queryFn: fetchSubjects,
   });
 
+  useEffect(() => {
+    console.log('Subjects data:', subjects);
+    console.log('Loading:', isLoading);
+    console.log('Error:', error);
+  }, [subjects, isLoading, error]);
+
   const renderSubjectCard = (subject: Subject) => (
     <TouchableOpacity
       key={subject.id}
