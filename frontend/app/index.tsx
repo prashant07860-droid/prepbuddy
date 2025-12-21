@@ -38,10 +38,29 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([
+    {
+      id: '1',
+      name: 'Polity',
+      description: 'Constitution of India, governance, rights, duties, institutions',
+      icon: 'bank',
+      color: '#3B82F6',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+    {
+      id: '2',
+      name: 'Geography',
+      description: 'Physical Geography, Indian Geography, Odisha Geography',
+      icon: 'earth',
+      color: '#10B981',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const [initialized, setInitialized] = useState(true);
 
   const fetchSubjects = async () => {
     try {
