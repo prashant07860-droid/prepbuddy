@@ -39,8 +39,63 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [subjects, setSubjects] = useState<Subject[]>([
+    {
+      id: '1',
+      name: 'Polity',
+      description: 'Constitution of India, governance, rights, duties, institutions',
+      icon: 'bank',
+      color: '#3B82F6',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+    {
+      id: '2',
+      name: 'Geography',
+      description: 'Physical Geography, Indian Geography, Odisha Geography',
+      icon: 'earth',
+      color: '#10B981',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+    {
+      id: '3',
+      name: 'History of Modern India',
+      description: 'Freedom struggle, reforms, movements (1757-1947)',
+      icon: 'book-open-variant',
+      color: '#F59E0B',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+    {
+      id: '4',
+      name: 'Ethics',
+      description: 'Ethics & Human Values, integrity, aptitude, moral thinkers',
+      icon: 'scale-balance',
+      color: '#8B5CF6',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+    {
+      id: '5',
+      name: 'Science and Technology',
+      description: 'General science, emerging technologies, space, defence',
+      icon: 'atom',
+      color: '#EC4899',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+    {
+      id: '6',
+      name: 'Economics',
+      description: 'Indian economy basics, growth, inflation, budgeting',
+      icon: 'chart-line',
+      color: '#06B6D4',
+      total_papers: 20,
+      total_questions: 2000,
+    },
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSubjects = useCallback(async () => {
@@ -65,34 +120,9 @@ export default function HomeScreen() {
   // Client-side only data fetching using useEffect
   useEffect(() => {
     // Only run on client
-    if (Platform.OS === 'web' && typeof window === 'undefined') {
-      return;
+    if (typeof window !== 'undefined') {
+      fetchSubjects();
     }
-    
-    let isActive = true;
-    
-    const doFetch = async () => {
-      try {
-        const response = await fetch('/api/subjects');
-        if (!response.ok) throw new Error('Failed');
-        const data = await response.json();
-        if (isActive) {
-          setSubjects(data);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        if (isActive) {
-          setError('Failed to load subjects');
-          setIsLoading(false);
-        }
-      }
-    };
-    
-    doFetch();
-    
-    return () => {
-      isActive = false;
-    };
   }, []);
 
   const renderSubjectCard = (subject: Subject) => (
