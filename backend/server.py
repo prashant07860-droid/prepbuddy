@@ -508,6 +508,7 @@ async def get_settings():
         default_settings = UserSettings()
         await db.settings.insert_one(default_settings.dict())
         return default_settings.dict()
+    settings.pop('_id', None)
     return settings
 
 @api_router.put("/settings")
