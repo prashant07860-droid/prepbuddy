@@ -430,6 +430,8 @@ async def get_attempts(
         query["paper_id"] = paper_id
     
     attempts = await db.attempts.find(query).sort("created_at", -1).to_list(limit)
+    for a in attempts:
+        a.pop('_id', None)
     return attempts
 
 @api_router.get("/analytics")
