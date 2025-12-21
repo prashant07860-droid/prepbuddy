@@ -39,14 +39,14 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
 export default function HomeScreen() {
   const router = useRouter();
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   const fetchSubjects = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log('Fetching subjects...');
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
       
@@ -55,18 +55,16 @@ export default function HomeScreen() {
       });
       clearTimeout(timeoutId);
       
-      console.log('Response status:', response.status);
       if (!response.ok) {
         throw new Error(`Failed to fetch subjects: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Received data:', data.length, 'subjects');
       setSubjects(data);
     } catch (err) {
-      console.error('Error fetching:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
+      setInitialized(true);
     }
   };
 
