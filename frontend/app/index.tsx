@@ -106,7 +106,7 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
-  if (isLoading) {
+  if (isLoading || !initialized) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
