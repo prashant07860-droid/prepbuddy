@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,43 +8,106 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { fetchSubject, fetchPapers, fetchAttempts, Paper } from '../../src/api';
+
+interface Subject {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  total_papers: number;
+  total_questions: number;
+}
+
+interface Paper {
+  id: string;
+  subject_id: string;
+  paper_number: number;
+  is_master: boolean;
+  title: string;
+  total_questions: number;
+  duration_minutes: number;
+}
+
+interface Attempt {
+  id: string;
+  paper_id: string;
+  score_percentage: number;
+}
+
+// Subject data mapping
+const SUBJECTS_MAP: Record<string, { name: string; color: string }> = {
+  'bf517fa7-5aac-4639-8363-2aeaa198b915': { name: 'Polity', color: '#3B82F6' },
+  'a41db799-f11b-44cb-b987-c8b744353ee9': { name: 'Geography', color: '#10B981' },
+  'bb219476-4e4c-4337-ac93-0022a1b0116f': { name: 'History of Modern India', color: '#F59E0B' },
+  '0e3373c7-aee7-433c-9922-ff1da0806a3f': { name: 'Ethics', color: '#8B5CF6' },
+  'c32206e4-4f15-4c7e-a6c7-227361d90a76': { name: 'Science and Technology', color: '#EC4899' },
+  '138bb0a1-4b12-4eac-838b-b02d7ba2f192': { name: 'Economics', color: '#06B6D4' },
+  'da991167-40b5-43d6-b8fd-4b913d3da04a': { name: 'Environment and Ecology', color: '#22C55E' },
+  '5cf4e1e2-2d0a-41df-b06b-1a7ed058278d': { name: 'Ancient & Medieval History', color: '#D97706' },
+  'ff1a2f17-6ca0-4c83-b58d-22b3280b4f04': { name: 'Indian Society', color: '#EF4444' },
+  '6d0a547e-ed97-4741-ba10-8c9d2a3aed2f': { name: 'Odisha Studies', color: '#7C3AED' },
+  '8b5a7f40-4cec-45fb-a2c6-80bbb339a5b7': { name: 'Current Affairs', color: '#0EA5E9' },
+};
 
 export default function SubjectScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'practice' | 'master'>('practice');
+  
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [papers, setPapers] = useState<Paper[]>([]);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: subject, isLoading: subjectLoading } = useQuery({
-    queryKey: ['subject', id],
-    queryFn: () => fetchSubject(id!),
-    enabled: !!id,
-  });
+  const subjectInfo = id ? SUBJECTS_MAP[id] : null;
 
-  const { data: papers, isLoading: papersLoading } = useQuery({
-    queryKey: ['papers', id],
-    queryFn: () => fetchPapers(id!),
-    enabled: !!id,
-  });
+  const fetchData = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      setIsLoading(true);
+      
+      // Fetch papers
+      const papersRes = await fetch(`/api/subjects/${id}/papers`);
+      if (papersRes.ok) {
+        const papersData = await papersRes.json();
+        setPapers(papersData);
+      }
 
-  const { data: attempts } = useQuery({
-    queryKey: ['attempts', id],
-    queryFn: () => fetchAttempts({ subject_id: id }),
-    enabled: !!id,
-  });
+      // Fetch attempts
+      const attemptsRes = await fetch(`/api/attempts?subject_id=${id}`);
+      if (attemptsRes.ok) {
+        const attemptsData = await attemptsRes.json();
+        setAttempts(attemptsData);
+      }
 
-  const practicePapers = papers?.filter((p) => !p.is_master) || [];
-  const masterPaper = papers?.find((p) => p.is_master);
+      // Fetch subject
+      const subjectRes = await fetch(`/api/subjects/${id}`);
+      if (subjectRes.ok) {
+        const subjectData = await subjectRes.json();
+        setSubject(subjectData);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
 
-  const getAttemptForPaper = (paperId: string) => {
-    return attempts?.find((a) => a.paper_id === paperId);
-  };
+  useEffect(() => {
+    if (typeof window !== 'undefined' && id) {
+      fetchData();
+    }
+  }, [id, fetchData]);
+
+  const practicePapers = papers.filter((p) => !p.is_master);
+  const masterPaper = papers.find((p) => p.is_master);
 
   const getBestScore = (paperId: string) => {
-    const paperAttempts = attempts?.filter((a) => a.paper_id === paperId) || [];
+    const paperAttempts = attempts.filter((a) => a.paper_id === paperId);
     if (paperAttempts.length === 0) return null;
     return Math.max(...paperAttempts.map((a) => a.score_percentage));
   };
@@ -103,11 +166,25 @@ export default function SubjectScreen() {
     );
   };
 
-  if (subjectLoading || papersLoading) {
+  if (isLoading && papers.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#F8FAFC" />
+          </TouchableOpacity>
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>
+              {subjectInfo?.name || 'Loading...'}
+            </Text>
+          </View>
+        </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
+          <Text style={styles.loadingText}>Loading papers...</Text>
         </View>
       </SafeAreaView>
     );
@@ -124,10 +201,10 @@ export default function SubjectScreen() {
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {subject?.name}
+            {subject?.name || subjectInfo?.name || 'Subject'}
           </Text>
           <Text style={styles.headerSubtitle}>
-            {practicePapers.length} Practice + 1 Master
+            {practicePapers.length} Practice + {masterPaper ? '1 Master' : '0 Master'}
           </Text>
         </View>
       </View>
@@ -171,7 +248,11 @@ export default function SubjectScreen() {
             <Text style={styles.sectionInfo}>
               Practice with previous year questions pattern
             </Text>
-            {practicePapers.map(renderPaperCard)}
+            {practicePapers.length > 0 ? (
+              practicePapers.map(renderPaperCard)
+            ) : (
+              <Text style={styles.emptyText}>No practice papers available</Text>
+            )}
           </>
         ) : (
           <>
@@ -181,7 +262,9 @@ export default function SubjectScreen() {
                 Predicted questions based on recent trends and high-probability topics
               </Text>
             </View>
-            {masterPaper && renderPaperCard(masterPaper)}
+            {masterPaper ? renderPaperCard(masterPaper) : (
+              <Text style={styles.emptyText}>No master paper available</Text>
+            )}
           </>
         )}
       </ScrollView>
@@ -366,5 +449,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#94A3B8',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
