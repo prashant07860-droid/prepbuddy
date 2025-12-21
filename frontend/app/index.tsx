@@ -64,10 +64,10 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    // Delay fetch slightly to ensure component is mounted
+    // Delay fetch to ensure component is mounted and ready
     const timer = setTimeout(() => {
       fetchSubjects();
-    }, 100);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
