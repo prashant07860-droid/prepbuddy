@@ -216,25 +216,6 @@ export default function SubjectScreen() {
     );
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#F8FAFC" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {subject?.name || subjectInfo?.name || 'Subject'}
-          </Text>
-          <Text style={styles.headerSubtitle}>
-            {practicePapers.length} Practice + {masterPaper ? '1 Master' : '0 Master'}
-          </Text>
-        </View>
-      </View>
-
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'practice' && styles.tabActive]}
