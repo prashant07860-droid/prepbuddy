@@ -38,43 +38,18 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<Subject[]>([
-    {
-      id: '1',
-      name: 'Polity',
-      description: 'Constitution of India, governance, rights, duties, institutions',
-      icon: 'bank',
-      color: '#3B82F6',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: '2',
-      name: 'Geography',
-      description: 'Physical Geography, Indian Geography, Odisha Geography',
-      icon: 'earth',
-      color: '#10B981',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(true);
 
   const fetchSubjects = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
       
-      // Use absolute URL
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-      const response = await fetch(`${baseUrl}/api/subjects`, {
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
+      // Use absolute URL based on window location
+      const baseUrl = typeof window !== 'undefined' && window.location ? window.location.origin : '';
+      const response = await fetch(`${baseUrl}/api/subjects`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch subjects: ${response.status}`);
@@ -85,12 +60,15 @@ export default function HomeScreen() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
-      setInitialized(true);
     }
   };
 
   useEffect(() => {
-    fetchSubjects();
+    // Delay fetch slightly to ensure component is mounted
+    const timer = setTimeout(() => {
+      fetchSubjects();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const renderSubjectCard = (subject: Subject) => (
