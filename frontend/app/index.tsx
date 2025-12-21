@@ -41,36 +41,29 @@ export default function HomeScreen() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const response = await fetch('/api/subjects');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch subjects: ${response.status}`);
-        }
-        const data = await response.json();
-        setSubjects(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setIsLoading(false);
+  const fetchSubjects = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/subjects');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subjects: ${response.status}`);
       }
-    };
-    
-    fetchData();
-  }, [mounted]);
+      const data = await response.json();
+      setSubjects(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubjects();
+  }, []);
 
   const renderSubjectCard = (subject: Subject) => (
     <TouchableOpacity
