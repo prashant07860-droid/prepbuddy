@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime
-
+import random
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,38 +19,602 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
+# Create the main app
 app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-# Define Models
-class StatusCheck(BaseModel):
+# ============ MODELS ============
+
+class Subject(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    name: str
+    description: str
+    icon: str
+    color: str
+    total_papers: int = 20
+    total_questions: int = 2000
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class Paper(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    subject_id: str
+    paper_number: int
+    is_master: bool = False
+    title: str
+    total_questions: int = 100
+    duration_minutes: int = 90
 
-# Add your routes to the router instead of directly to app
+class Question(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    paper_id: str
+    subject_id: str
+    question_number: int
+    question_text: str
+    options: List[str]
+    correct_option: int  # 0-3 index
+    explanation: Optional[str] = None
+    difficulty: str = "medium"  # easy, medium, hard
+    topic: str = ""
+
+class AttemptCreate(BaseModel):
+    paper_id: str
+    subject_id: str
+    answers: Dict[str, int]  # question_id -> selected_option
+    time_taken_seconds: int
+    timer_mode: str = "total"  # total or per_question
+
+class Attempt(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str = "default_user"
+    paper_id: str
+    subject_id: str
+    answers: Dict[str, int]
+    correct_count: int
+    wrong_count: int
+    skipped_count: int
+    total_questions: int
+    score_percentage: float
+    time_taken_seconds: int
+    timer_mode: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserSettings(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str = "default_user"
+    timer_mode: str = "total"  # total or per_question
+    total_time_minutes: int = 90
+    per_question_seconds: int = 60
+    show_timer: bool = True
+
+# ============ SUBJECT DATA ============
+
+SUBJECTS_DATA = [
+    {
+        "name": "Polity",
+        "description": "Constitution of India, governance, rights, duties, institutions",
+        "icon": "bank",
+        "color": "#3B82F6"
+    },
+    {
+        "name": "Geography",
+        "description": "Physical Geography, Indian Geography, Odisha Geography",
+        "icon": "earth",
+        "color": "#10B981"
+    },
+    {
+        "name": "History of Modern India",
+        "description": "Freedom struggle, reforms, movements (1757-1947)",
+        "icon": "book-open-variant",
+        "color": "#F59E0B"
+    },
+    {
+        "name": "Ethics",
+        "description": "Ethics & Human Values, integrity, aptitude, moral thinkers, case studies",
+        "icon": "scale-balance",
+        "color": "#8B5CF6"
+    },
+    {
+        "name": "Science and Technology",
+        "description": "General science, emerging technologies, space, defence, health, IT",
+        "icon": "atom",
+        "color": "#EC4899"
+    },
+    {
+        "name": "Economics",
+        "description": "Indian economy basics, growth, inflation, budgeting, development & planning",
+        "icon": "chart-line",
+        "color": "#06B6D4"
+    },
+    {
+        "name": "Environment and Ecology",
+        "description": "Ecology basics, climate change, environmental laws & conventions",
+        "icon": "leaf",
+        "color": "#22C55E"
+    },
+    {
+        "name": "Ancient & Medieval Indian History",
+        "description": "Pre-independence Indian history, dynasties, culture, architecture",
+        "icon": "castle",
+        "color": "#D97706"
+    },
+    {
+        "name": "Indian Society & Social Issues",
+        "description": "Social structure, issues, diversity, communalism, regionalism",
+        "icon": "account-group",
+        "color": "#EF4444"
+    },
+    {
+        "name": "Odisha-Specific Studies",
+        "description": "History & culture of Odisha, Odisha economy, state schemes & governance",
+        "icon": "map-marker",
+        "color": "#7C3AED"
+    },
+    {
+        "name": "Current Affairs",
+        "description": "National, International current events and developments",
+        "icon": "newspaper",
+        "color": "#0EA5E9"
+    }
+]
+
+# ============ QUESTION TEMPLATES ============
+
+QUESTION_TEMPLATES = {
+    "Polity": {
+        "topics": ["Constitution", "Fundamental Rights", "Directive Principles", "Parliament", "Judiciary", "President", "Governor", "Panchayati Raj", "Elections", "Constitutional Amendments"],
+        "questions": [
+            ("Which Article of the Indian Constitution deals with {topic}?", ["Article 14", "Article 21", "Article 32", "Article 19"], 0),
+            ("The {topic} was added to the Constitution by which Amendment?", ["42nd Amendment", "44th Amendment", "73rd Amendment", "86th Amendment"], 0),
+            ("Which of the following is NOT a feature of {topic}?", ["Option A related to topic", "Option B related to topic", "Option C unrelated", "Option D related to topic"], 2),
+            ("The concept of {topic} in Indian Constitution is borrowed from which country?", ["USA", "UK", "Ireland", "Germany"], 0),
+            ("Who has the power to decide disputes regarding {topic}?", ["Supreme Court", "High Court", "President", "Parliament"], 0),
+        ]
+    },
+    "Geography": {
+        "topics": ["Rivers", "Mountains", "Climate", "Soil Types", "Agriculture", "Minerals", "Industries", "Population", "Odisha Geography", "Natural Vegetation"],
+        "questions": [
+            ("Which of the following rivers originates in {topic} region?", ["Mahanadi", "Godavari", "Krishna", "Brahmani"], 0),
+            ("The {topic} is characterized by which type of climate?", ["Tropical Monsoon", "Semi-arid", "Humid Subtropical", "Temperate"], 0),
+            ("Which district of Odisha is known for {topic}?", ["Mayurbhanj", "Koraput", "Sundargarh", "Cuttack"], 0),
+            ("The largest {topic} in India is located in which state?", ["Odisha", "Jharkhand", "Chhattisgarh", "West Bengal"], 0),
+            ("What percentage of Odisha is covered by {topic}?", ["33%", "25%", "40%", "20%"], 0),
+        ]
+    },
+    "History of Modern India": {
+        "topics": ["Revolt of 1857", "Indian National Congress", "Non-Cooperation Movement", "Civil Disobedience", "Quit India Movement", "Partition", "British Reforms", "Social Reformers", "Revolutionary Movements", "Provincial Elections"],
+        "questions": [
+            ("The {topic} was started in which year?", ["1857", "1919", "1930", "1942"], 0),
+            ("Who was the main leader associated with {topic}?", ["Mahatma Gandhi", "Jawaharlal Nehru", "Subhas Chandra Bose", "Bal Gangadhar Tilak"], 0),
+            ("Which event triggered the {topic}?", ["Jallianwala Bagh Massacre", "Partition of Bengal", "Salt Tax", "Rowlatt Act"], 0),
+            ("The {topic} had its major impact in which region?", ["Bengal", "Punjab", "Maharashtra", "Odisha"], 0),
+            ("Which British policy was opposed during {topic}?", ["Divide and Rule", "Doctrine of Lapse", "Subsidiary Alliance", "Permanent Settlement"], 0),
+        ]
+    },
+    "Ethics": {
+        "topics": ["Integrity", "Impartiality", "Objectivity", "Dedication to Public Service", "Empathy", "Tolerance", "Compassion", "Emotional Intelligence", "Moral Thinkers", "Ethical Dilemmas"],
+        "questions": [
+            ("Which value is most important for a civil servant in context of {topic}?", ["Integrity", "Efficiency", "Obedience", "Loyalty"], 0),
+            ("According to {topic}, what should be the primary concern of administration?", ["Public Welfare", "Economic Growth", "Political Stability", "Personal Achievement"], 0),
+            ("The concept of {topic} was propounded by which philosopher?", ["Mahatma Gandhi", "Aristotle", "Kant", "John Rawls"], 0),
+            ("In case of ethical dilemma regarding {topic}, what is the best approach?", ["Follow conscience", "Follow rules strictly", "Seek guidance", "Avoid decision"], 0),
+            ("Which of the following best describes {topic}?", ["Acting without bias", "Following orders", "Maximizing efficiency", "Minimizing conflicts"], 0),
+        ]
+    },
+    "Science and Technology": {
+        "topics": ["Space Technology", "Nuclear Energy", "Biotechnology", "Information Technology", "Defence Technology", "Nanotechnology", "Artificial Intelligence", "Renewable Energy", "Medical Science", "Agriculture Technology"],
+        "questions": [
+            ("Which organization is primarily responsible for {topic} in India?", ["ISRO", "DRDO", "BARC", "CSIR"], 0),
+            ("The latest development in {topic} includes which of the following?", ["Chandrayaan-3", "Agni-V", "Tejas", "INS Vikrant"], 0),
+            ("What is the primary application of {topic}?", ["Research", "Defence", "Agriculture", "Healthcare"], 0),
+            ("Which mission of India is related to {topic}?", ["Gaganyaan", "Make in India", "Digital India", "Startup India"], 0),
+            ("The {topic} sector in India is regulated by which body?", ["ISRO", "DAE", "DST", "DRDO"], 0),
+        ]
+    },
+    "Economics": {
+        "topics": ["GDP", "Inflation", "Budget", "Fiscal Policy", "Monetary Policy", "Banking", "Taxation", "Foreign Trade", "Public Debt", "Economic Planning"],
+        "questions": [
+            ("Which factor directly affects {topic} in India?", ["Government spending", "Private investment", "Exports", "Imports"], 0),
+            ("The {topic} of India is managed by which institution?", ["RBI", "SEBI", "Finance Ministry", "NITI Aayog"], 0),
+            ("What is the current target for {topic} in India?", ["4%", "6%", "8%", "10%"], 0),
+            ("Which scheme is related to improving {topic}?", ["Make in India", "Digital India", "Skill India", "Startup India"], 0),
+            ("The {topic} has shown what trend in the last decade?", ["Increasing", "Decreasing", "Stable", "Fluctuating"], 0),
+        ]
+    },
+    "Environment and Ecology": {
+        "topics": ["Climate Change", "Biodiversity", "Pollution", "Forest Conservation", "Wildlife Protection", "Wetlands", "Sustainable Development", "Environmental Laws", "International Conventions", "Renewable Resources"],
+        "questions": [
+            ("Which international convention deals with {topic}?", ["Paris Agreement", "Kyoto Protocol", "Montreal Protocol", "Ramsar Convention"], 0),
+            ("The {topic} in India is governed by which act?", ["Environment Protection Act", "Wildlife Protection Act", "Forest Conservation Act", "Water Act"], 0),
+            ("Which state has the highest {topic} index?", ["Kerala", "Odisha", "Madhya Pradesh", "Maharashtra"], 0),
+            ("The National Action Plan on {topic} was launched in which year?", ["2008", "2010", "2015", "2020"], 0),
+            ("Which of the following is a consequence of {topic}?", ["Sea level rise", "Desertification", "Loss of biodiversity", "All of these"], 3),
+        ]
+    },
+    "Ancient & Medieval Indian History": {
+        "topics": ["Indus Valley Civilization", "Vedic Period", "Mauryan Empire", "Gupta Empire", "Delhi Sultanate", "Mughal Empire", "Vijayanagara Empire", "Chola Dynasty", "Buddhist Period", "Temple Architecture"],
+        "questions": [
+            ("The {topic} was established during which century?", ["3rd century BCE", "4th century CE", "12th century CE", "16th century CE"], 0),
+            ("Which ruler is associated with the golden age of {topic}?", ["Ashoka", "Chandragupta II", "Akbar", "Krishnadevaraya"], 0),
+            ("The administrative system of {topic} included which feature?", ["Decentralized governance", "Centralized bureaucracy", "Feudal system", "Democratic assemblies"], 0),
+            ("Which architectural style is characteristic of {topic}?", ["Indo-Islamic", "Dravidian", "Nagara", "Vesara"], 0),
+            ("The decline of {topic} was caused by which factor?", ["Foreign invasions", "Internal conflicts", "Economic decline", "All of these"], 3),
+        ]
+    },
+    "Indian Society & Social Issues": {
+        "topics": ["Caste System", "Gender Issues", "Poverty", "Urbanization", "Migration", "Communalism", "Regionalism", "Globalization Effects", "Education", "Healthcare"],
+        "questions": [
+            ("Which government scheme addresses {topic} in India?", ["MGNREGA", "PMJDY", "Beti Bachao", "Swachh Bharat"], 0),
+            ("The {topic} in India has shown what trend recently?", ["Improvement", "Deterioration", "No change", "Regional variation"], 0),
+            ("Which constitutional provision deals with {topic}?", ["Article 15", "Article 17", "Article 21", "Article 46"], 0),
+            ("The main cause of {topic} in India is?", ["Economic inequality", "Social discrimination", "Political factors", "All of these"], 3),
+            ("Which commission was formed to study {topic}?", ["Mandal Commission", "Sachar Committee", "Justice Verma Committee", "Ranganath Misra Commission"], 0),
+        ]
+    },
+    "Odisha-Specific Studies": {
+        "topics": ["Kalinga History", "Jagannath Culture", "Odissi Dance", "Tribal Communities", "Odisha Economy", "State Schemes", "Panchayati Raj in Odisha", "Industrial Development", "Natural Resources", "Coastal Geography"],
+        "questions": [
+            ("The {topic} of Odisha is famous for which aspect?", ["Cultural heritage", "Economic significance", "Historical importance", "All of these"], 3),
+            ("Which district of Odisha is known for {topic}?", ["Puri", "Koraput", "Sundargarh", "Khordha"], 0),
+            ("The state government's initiative for {topic} was launched in which year?", ["2015", "2018", "2020", "2022"], 0),
+            ("What percentage of Odisha's economy depends on {topic}?", ["30%", "40%", "50%", "20%"], 0),
+            ("Which temple or monument is associated with {topic}?", ["Konark Sun Temple", "Jagannath Temple", "Lingaraj Temple", "Udayagiri Caves"], 0),
+        ]
+    },
+    "Current Affairs": {
+        "topics": ["National Politics", "International Relations", "Economic Developments", "Science Achievements", "Sports Events", "Environmental Issues", "Social Schemes", "Defence Updates", "Technology News", "Awards and Honors"],
+        "questions": [
+            ("Which recent development is related to {topic}?", ["G20 Summit 2023", "Chandrayaan-3", "Women's Reservation Bill", "Digital India 2.0"], 0),
+            ("The {topic} of 2024 was significant because of?", ["Policy changes", "International cooperation", "Technological advancement", "All of these"], 3),
+            ("Which country hosted the recent summit on {topic}?", ["India", "USA", "China", "UAE"], 0),
+            ("The government's latest initiative on {topic} aims to?", ["Improve efficiency", "Increase coverage", "Reduce costs", "All of these"], 3),
+            ("Which organization released the report on {topic}?", ["UN", "World Bank", "IMF", "WTO"], 0),
+        ]
+    }
+}
+
+# ============ HELPER FUNCTIONS ============
+
+def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, is_master: bool = False) -> List[dict]:
+    """Generate realistic OPSC-style questions for a subject"""
+    questions = []
+    template_data = QUESTION_TEMPLATES.get(subject_name, QUESTION_TEMPLATES["Polity"])
+    topics = template_data["topics"]
+    templates = template_data["questions"]
+    
+    for i in range(count):
+        topic = random.choice(topics)
+        template = random.choice(templates)
+        
+        question_text = template[0].format(topic=topic)
+        options = [opt.replace("{topic}", topic) for opt in template[1]]
+        correct_option = template[2]
+        
+        # Shuffle options for variety
+        if random.random() > 0.5:
+            random.shuffle(options)
+            # Update correct option index after shuffle
+            correct_option = random.randint(0, 3)
+        
+        difficulty = random.choice(["easy", "medium", "medium", "hard"]) if not is_master else random.choice(["medium", "hard", "hard"])
+        
+        question = {
+            "id": str(uuid.uuid4()),
+            "paper_id": paper_id,
+            "subject_id": subject_id,
+            "question_number": i + 1,
+            "question_text": question_text,
+            "options": options,
+            "correct_option": correct_option,
+            "explanation": f"This question tests knowledge of {topic} in {subject_name}. The correct answer demonstrates understanding of key concepts.",
+            "difficulty": difficulty,
+            "topic": topic
+        }
+        questions.append(question)
+    
+    return questions
+
+# ============ API ENDPOINTS ============
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "OPSC Exam Prep API", "version": "1.0"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+@api_router.get("/subjects")
+async def get_subjects():
+    """Get all subjects"""
+    subjects = await db.subjects.find().to_list(100)
+    if not subjects:
+        # Return empty list if no subjects seeded yet
+        return []
+    return subjects
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/subjects/{subject_id}")
+async def get_subject(subject_id: str):
+    """Get a specific subject"""
+    subject = await db.subjects.find_one({"id": subject_id})
+    if not subject:
+        raise HTTPException(status_code=404, detail="Subject not found")
+    return subject
+
+@api_router.get("/subjects/{subject_id}/papers")
+async def get_papers(subject_id: str):
+    """Get all papers for a subject"""
+    papers = await db.papers.find({"subject_id": subject_id}).sort("paper_number", 1).to_list(100)
+    return papers
+
+@api_router.get("/papers/{paper_id}")
+async def get_paper(paper_id: str):
+    """Get a specific paper"""
+    paper = await db.papers.find_one({"id": paper_id})
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found")
+    return paper
+
+@api_router.get("/papers/{paper_id}/questions")
+async def get_questions(paper_id: str):
+    """Get all questions for a paper"""
+    questions = await db.questions.find({"paper_id": paper_id}).sort("question_number", 1).to_list(200)
+    return questions
+
+@api_router.post("/attempts")
+async def create_attempt(attempt_data: AttemptCreate):
+    """Submit an exam attempt"""
+    # Get questions for the paper
+    questions = await db.questions.find({"paper_id": attempt_data.paper_id}).to_list(200)
+    
+    if not questions:
+        raise HTTPException(status_code=404, detail="Paper not found")
+    
+    # Calculate score
+    correct_count = 0
+    wrong_count = 0
+    skipped_count = 0
+    
+    for q in questions:
+        q_id = q["id"]
+        if q_id in attempt_data.answers:
+            if attempt_data.answers[q_id] == q["correct_option"]:
+                correct_count += 1
+            else:
+                wrong_count += 1
+        else:
+            skipped_count += 1
+    
+    total_questions = len(questions)
+    score_percentage = (correct_count / total_questions) * 100 if total_questions > 0 else 0
+    
+    attempt = Attempt(
+        paper_id=attempt_data.paper_id,
+        subject_id=attempt_data.subject_id,
+        answers=attempt_data.answers,
+        correct_count=correct_count,
+        wrong_count=wrong_count,
+        skipped_count=skipped_count,
+        total_questions=total_questions,
+        score_percentage=round(score_percentage, 2),
+        time_taken_seconds=attempt_data.time_taken_seconds,
+        timer_mode=attempt_data.timer_mode
+    )
+    
+    await db.attempts.insert_one(attempt.dict())
+    return attempt
+
+@api_router.get("/attempts")
+async def get_attempts(
+    subject_id: Optional[str] = None,
+    paper_id: Optional[str] = None,
+    limit: int = Query(default=50, le=100)
+):
+    """Get user's attempt history"""
+    query = {"user_id": "default_user"}
+    if subject_id:
+        query["subject_id"] = subject_id
+    if paper_id:
+        query["paper_id"] = paper_id
+    
+    attempts = await db.attempts.find(query).sort("created_at", -1).to_list(limit)
+    return attempts
+
+@api_router.get("/analytics")
+async def get_analytics():
+    """Get performance analytics"""
+    attempts = await db.attempts.find({"user_id": "default_user"}).to_list(1000)
+    
+    if not attempts:
+        return {
+            "total_attempts": 0,
+            "total_questions_attempted": 0,
+            "overall_accuracy": 0,
+            "subject_performance": [],
+            "recent_scores": [],
+            "best_score": 0,
+            "average_score": 0
+        }
+    
+    # Calculate overall stats
+    total_correct = sum(a["correct_count"] for a in attempts)
+    total_questions = sum(a["total_questions"] for a in attempts)
+    overall_accuracy = (total_correct / total_questions * 100) if total_questions > 0 else 0
+    
+    # Subject-wise performance
+    subject_stats = {}
+    for attempt in attempts:
+        sid = attempt["subject_id"]
+        if sid not in subject_stats:
+            subject_stats[sid] = {"correct": 0, "total": 0, "attempts": 0, "scores": []}
+        subject_stats[sid]["correct"] += attempt["correct_count"]
+        subject_stats[sid]["total"] += attempt["total_questions"]
+        subject_stats[sid]["attempts"] += 1
+        subject_stats[sid]["scores"].append(attempt["score_percentage"])
+    
+    # Get subject names
+    subjects = await db.subjects.find().to_list(100)
+    subject_names = {s["id"]: s["name"] for s in subjects}
+    
+    subject_performance = []
+    for sid, stats in subject_stats.items():
+        accuracy = (stats["correct"] / stats["total"] * 100) if stats["total"] > 0 else 0
+        subject_performance.append({
+            "subject_id": sid,
+            "subject_name": subject_names.get(sid, "Unknown"),
+            "attempts": stats["attempts"],
+            "accuracy": round(accuracy, 2),
+            "best_score": max(stats["scores"]) if stats["scores"] else 0,
+            "average_score": round(sum(stats["scores"]) / len(stats["scores"]), 2) if stats["scores"] else 0
+        })
+    
+    # Recent scores (last 10)
+    recent_attempts = sorted(attempts, key=lambda x: x["created_at"], reverse=True)[:10]
+    recent_scores = [{"date": a["created_at"].isoformat(), "score": a["score_percentage"]} for a in recent_attempts]
+    
+    # Best and average score
+    all_scores = [a["score_percentage"] for a in attempts]
+    
+    return {
+        "total_attempts": len(attempts),
+        "total_questions_attempted": total_questions,
+        "overall_accuracy": round(overall_accuracy, 2),
+        "subject_performance": subject_performance,
+        "recent_scores": recent_scores,
+        "best_score": max(all_scores) if all_scores else 0,
+        "average_score": round(sum(all_scores) / len(all_scores), 2) if all_scores else 0
+    }
+
+@api_router.get("/settings")
+async def get_settings():
+    """Get user settings"""
+    settings = await db.settings.find_one({"user_id": "default_user"})
+    if not settings:
+        # Return default settings
+        default_settings = UserSettings()
+        await db.settings.insert_one(default_settings.dict())
+        return default_settings.dict()
+    return settings
+
+@api_router.put("/settings")
+async def update_settings(settings: UserSettings):
+    """Update user settings"""
+    settings.user_id = "default_user"
+    await db.settings.update_one(
+        {"user_id": "default_user"},
+        {"$set": settings.dict()},
+        upsert=True
+    )
+    return settings
+
+@api_router.post("/seed")
+async def seed_database():
+    """Seed the database with subjects, papers, and questions"""
+    try:
+        # Check if already seeded
+        existing_subjects = await db.subjects.count_documents({})
+        if existing_subjects > 0:
+            return {"message": "Database already seeded", "subjects": existing_subjects}
+        
+        logger.info("Starting database seeding...")
+        
+        # Seed subjects
+        subjects_created = []
+        for subject_data in SUBJECTS_DATA:
+            subject = Subject(**subject_data)
+            await db.subjects.insert_one(subject.dict())
+            subjects_created.append(subject)
+            logger.info(f"Created subject: {subject.name}")
+        
+        # Seed papers and questions for each subject
+        total_papers = 0
+        total_questions = 0
+        
+        for subject in subjects_created:
+            # Create 20 practice papers
+            for paper_num in range(1, 21):
+                paper = Paper(
+                    subject_id=subject.id,
+                    paper_number=paper_num,
+                    is_master=False,
+                    title=f"{subject.name} Practice Paper {paper_num}",
+                    total_questions=100,
+                    duration_minutes=90
+                )
+                await db.papers.insert_one(paper.dict())
+                total_papers += 1
+                
+                # Generate questions for this paper
+                questions = generate_questions_for_subject(
+                    subject.name, paper.id, subject.id, 100, False
+                )
+                if questions:
+                    await db.questions.insert_many(questions)
+                    total_questions += len(questions)
+            
+            # Create 1 master sample paper
+            master_paper = Paper(
+                subject_id=subject.id,
+                paper_number=0,
+                is_master=True,
+                title=f"{subject.name} Master Prediction Paper",
+                total_questions=100,
+                duration_minutes=90
+            )
+            await db.papers.insert_one(master_paper.dict())
+            total_papers += 1
+            
+            # Generate master questions (higher difficulty)
+            master_questions = generate_questions_for_subject(
+                subject.name, master_paper.id, subject.id, 100, True
+            )
+            if master_questions:
+                await db.questions.insert_many(master_questions)
+                total_questions += len(master_questions)
+            
+            logger.info(f"Seeded papers and questions for: {subject.name}")
+        
+        # Create default settings
+        default_settings = UserSettings()
+        await db.settings.insert_one(default_settings.dict())
+        
+        return {
+            "message": "Database seeded successfully",
+            "subjects": len(subjects_created),
+            "papers": total_papers,
+            "questions": total_questions
+        }
+        
+    except Exception as e:
+        logger.error(f"Error seeding database: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/attempt/{attempt_id}/review")
+async def get_attempt_review(attempt_id: str):
+    """Get detailed review of an attempt with correct answers"""
+    attempt = await db.attempts.find_one({"id": attempt_id})
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+    
+    questions = await db.questions.find({"paper_id": attempt["paper_id"]}).sort("question_number", 1).to_list(200)
+    
+    review_data = []
+    for q in questions:
+        user_answer = attempt["answers"].get(q["id"], -1)
+        review_data.append({
+            "question": q,
+            "user_answer": user_answer,
+            "is_correct": user_answer == q["correct_option"],
+            "is_skipped": user_answer == -1
+        })
+    
+    return {
+        "attempt": attempt,
+        "review": review_data
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -62,13 +626,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
