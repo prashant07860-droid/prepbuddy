@@ -9,9 +9,8 @@ import {
   Alert,
   Dimensions,
   Modal,
-  Pressable,
 } from 'react-native';
-import { useRouter, useLocalSearchParams, Link } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
