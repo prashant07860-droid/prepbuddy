@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useAuth } from '../src/AuthContext';
 
 interface Subject {
   id: string;
