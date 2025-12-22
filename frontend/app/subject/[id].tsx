@@ -63,23 +63,24 @@ export default function SubjectScreen() {
     
     try {
       setIsLoading(true);
+      const apiBase = getApiBaseUrl();
       
       // Fetch subject info from API
-      const subjectRes = await fetch(`/api/subjects/${id}`);
+      const subjectRes = await fetch(`${apiBase}/api/subjects/${id}`);
       if (subjectRes.ok) {
         const subjectData = await subjectRes.json();
         setSubject(subjectData);
       }
       
       // Fetch papers from API
-      const papersRes = await fetch(`/api/subjects/${id}/papers`);
+      const papersRes = await fetch(`${apiBase}/api/subjects/${id}/papers`);
       if (papersRes.ok) {
         const papersData = await papersRes.json();
         setPapers(papersData);
       }
 
       // Fetch attempts
-      const attemptsRes = await fetch(`/api/attempts?subject_id=${id}`);
+      const attemptsRes = await fetch(`${apiBase}/api/attempts?subject_id=${id}`);
       if (attemptsRes.ok) {
         const attemptsData = await attemptsRes.json();
         setAttempts(attemptsData);
