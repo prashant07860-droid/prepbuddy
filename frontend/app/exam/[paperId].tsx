@@ -9,12 +9,22 @@ import {
   Alert,
   Dimensions,
   Modal,
+  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 
 const { width } = Dimensions.get('window');
+
+// Get backend URL from environment
+const getBackendUrl = () => {
+  const backendUrl = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL 
+    || process.env.EXPO_PUBLIC_BACKEND_URL 
+    || '';
+  return backendUrl;
+};
 
 interface Question {
   id: string;
@@ -39,35 +49,6 @@ interface Paper {
   duration_minutes: number;
 }
 
-// Sample questions generator
-const generateSampleQuestions = (paperId: string, count: number = 100): Question[] => {
-  const questions: Question[] = [];
-  const topics = ['Constitution', 'Governance', 'Rights', 'Duties', 'Institutions', 'Parliament', 'Judiciary'];
-  const difficulties = ['easy', 'medium', 'hard'];
-  
-  for (let i = 1; i <= count; i++) {
-    questions.push({
-      id: `${paperId}-q-${i}`,
-      paper_id: paperId,
-      subject_id: '',
-      question_number: i,
-      question_text: `Sample Question ${i}: Which of the following statements is correct regarding the ${topics[i % topics.length]}?`,
-      options: [
-        `Option A - Related to ${topics[i % topics.length]}`,
-        `Option B - Alternative answer`,
-        `Option C - Another possibility`,
-        `Option D - Different perspective`,
-      ],
-      correct_option: i % 4,
-      explanation: `This question tests knowledge of ${topics[i % topics.length]}. The correct answer demonstrates understanding of key concepts.`,
-      difficulty: difficulties[i % 3],
-      topic: topics[i % topics.length],
-    });
-  }
-  
-  return questions;
-};
-
 export default function ExamScreen() {
   const router = useRouter();
   const { paperId } = useLocalSearchParams<{ paperId: string }>();
@@ -75,29 +56,70 @@ export default function ExamScreen() {
   const [showNavigator, setShowNavigator] = useState(false);
   const [examStarted, setExamStarted] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [finalResult, setFinalResult] = useState<{
+    correct: number;
+    wrong: number;
+    skipped: number;
+    scorePercentage: number;
+    timeTaken: string;
+  } | null>(null);
 
   // State management
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<string[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
-  const [timerMode, setTimerMode] = useState<'total' | 'per_question'>('total');
   const [showTimer, setShowTimerState] = useState(true);
 
-  // Initialize questions
-  const [questions, setQuestions] = useState<Question[]>(() => 
-    paperId ? generateSampleQuestions(paperId) : []
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  // Data states
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [paper, setPaper] = useState<Paper | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Get paper info from paperId
-  const getPaperTitle = () => {
-    if (!paperId) return 'Exam';
-    if (paperId.includes('master')) return 'Master Prediction Paper';
-    const match = paperId.match(/practice-(\d+)/);
-    if (match) return `Practice Paper ${match[1]}`;
-    return 'Exam';
-  };
+  // Fetch questions from backend
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (!paperId) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const backendUrl = getBackendUrl();
+        
+        // Fetch paper details
+        const paperResponse = await fetch(`${backendUrl}/api/papers/${paperId}`);
+        if (paperResponse.ok) {
+          const paperData = await paperResponse.json();
+          setPaper(paperData);
+        }
+        
+        // Fetch questions
+        const questionsResponse = await fetch(`${backendUrl}/api/papers/${paperId}/questions`);
+        if (!questionsResponse.ok) {
+          throw new Error('Failed to fetch questions');
+        }
+        
+        const questionsData = await questionsResponse.json();
+        
+        if (questionsData && questionsData.length > 0) {
+          setQuestions(questionsData);
+        } else {
+          setError('No questions found for this paper');
+        }
+      } catch (err) {
+        console.error('Error fetching questions:', err);
+        setError('Failed to load questions. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [paperId]);
 
   // Timer effect
   useEffect(() => {
@@ -106,7 +128,7 @@ export default function ExamScreen() {
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          handleSubmit();
+          handleTimeUp();
           return 0;
         }
         return prev - 1;
@@ -115,6 +137,10 @@ export default function ExamScreen() {
 
     return () => clearInterval(interval);
   }, [examStarted, showTimer]);
+
+  const handleTimeUp = useCallback(() => {
+    calculateAndShowResult();
+  }, [questions, answers, startTime]);
 
   const handleStartExam = useCallback(() => {
     setExamStarted(true);
@@ -125,64 +151,11 @@ export default function ExamScreen() {
     setBookmarkedQuestions([]);
   }, []);
 
-  const handleCompleteTest = useCallback(() => {
-    if (!questions || questions.length === 0) return;
-
-    const answeredCount = Object.keys(answers).length;
-    const unansweredCount = questions.length - answeredCount;
-
-    Alert.alert(
-      'Complete Test',
-      `You have answered ${answeredCount} out of ${questions.length} questions.\n\n${unansweredCount > 0 ? `${unansweredCount} questions are still unanswered.\n\n` : ''}This would be your final submission. Are you sure you want to submit the test and see the results?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Submit Test',
-          style: 'destructive',
-          onPress: () => {
-            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-            
-            // Calculate score
-            let correct = 0;
-            let wrong = 0;
-            let skipped = 0;
-            
-            questions.forEach((q) => {
-              if (answers[q.id] !== undefined) {
-                if (answers[q.id] === q.correct_option) {
-                  correct++;
-                } else {
-                  wrong++;
-                }
-              } else {
-                skipped++;
-              }
-            });
-            
-            const scorePercentage = Math.round((correct / questions.length) * 100);
-
-            Alert.alert(
-              'Test Completed!',
-              `Your Score: ${scorePercentage}%\n\nCorrect: ${correct}\nWrong: ${wrong}\nSkipped: ${skipped}\nTime Taken: ${formatTime(timeTaken)}`,
-              [
-                {
-                  text: 'View Results',
-                  onPress: () => router.replace('/'),
-                },
-              ]
-            );
-          },
-        },
-      ]
-    );
-  }, [questions, answers, startTime, router]);
-
-  const handleSubmit = useCallback(() => {
+  const calculateAndShowResult = useCallback(() => {
     if (!questions || questions.length === 0) return;
 
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     
-    // Calculate score
     let correct = 0;
     let wrong = 0;
     let skipped = 0;
@@ -201,31 +174,45 @@ export default function ExamScreen() {
     
     const scorePercentage = Math.round((correct / questions.length) * 100);
 
-    Alert.alert(
-      'Exam Submitted!',
-      `Score: ${scorePercentage}%\nCorrect: ${correct}\nWrong: ${wrong}\nSkipped: ${skipped}\nTime: ${formatTime(timeTaken)}`,
-      [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/'),
-        },
-      ]
-    );
-  }, [questions, answers, startTime, router]);
+    setFinalResult({
+      correct,
+      wrong,
+      skipped,
+      scorePercentage,
+      timeTaken: formatTime(timeTaken),
+    });
+    
+    setShowCompleteModal(false);
+    setShowResultModal(true);
+  }, [questions, answers, startTime]);
+
+  const handleCompleteTest = useCallback(() => {
+    setShowCompleteModal(true);
+  }, []);
+
+  const handleConfirmComplete = useCallback(() => {
+    calculateAndShowResult();
+  }, [calculateAndShowResult]);
 
   const handleExit = () => {
-    Alert.alert(
-      'Exit Exam',
-      'Are you sure you want to exit? Your progress will be lost.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Exit',
-          style: 'destructive',
-          onPress: () => router.back(),
-        },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to exit? Your progress will be lost.')) {
+        router.back();
+      }
+    } else {
+      Alert.alert(
+        'Exit Exam',
+        'Are you sure you want to exit? Your progress will be lost.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Exit',
+            style: 'destructive',
+            onPress: () => router.back(),
+          },
+        ]
+      );
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -241,6 +228,7 @@ export default function ExamScreen() {
   const goToQuestion = (index: number) => {
     setCurrentQuestionIndex(index);
     setShowNavigator(false);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const setAnswer = (questionId: string, optionIndex: number) => {
@@ -263,12 +251,29 @@ export default function ExamScreen() {
     );
   };
 
-  if (!questions || questions.length === 0) {
+  // Loading state
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading exam...</Text>
+          <Text style={styles.loadingText}>Loading exam questions...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error || !questions || questions.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <MaterialCommunityIcons name="alert-circle" size={64} color="#EF4444" />
+          <Text style={styles.errorTitle}>Unable to Load Questions</Text>
+          <Text style={styles.errorText}>{error || 'No questions available for this paper.'}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => router.back()}>
+            <Text style={styles.retryButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -281,11 +286,11 @@ export default function ExamScreen() {
         <View style={styles.preExamContainer}>
           <View style={styles.preExamCard}>
             <MaterialCommunityIcons
-              name={paperId?.includes('master') ? 'star' : 'file-document'}
+              name={paper?.is_master ? 'star' : 'file-document'}
               size={48}
-              color={paperId?.includes('master') ? '#F59E0B' : '#3B82F6'}
+              color={paper?.is_master ? '#F59E0B' : '#3B82F6'}
             />
-            <Text style={styles.preExamTitle}>{getPaperTitle()}</Text>
+            <Text style={styles.preExamTitle}>{paper?.title || 'Exam'}</Text>
             
             <View style={styles.preExamStats}>
               <View style={styles.preExamStat}>
@@ -296,7 +301,7 @@ export default function ExamScreen() {
               <View style={styles.preExamStatDivider} />
               <View style={styles.preExamStat}>
                 <MaterialCommunityIcons name="clock" size={24} color="#64748B" />
-                <Text style={styles.preExamStatValue}>90</Text>
+                <Text style={styles.preExamStatValue}>{paper?.duration_minutes || 90}</Text>
                 <Text style={styles.preExamStatLabel}>Minutes</Text>
               </View>
             </View>
@@ -305,13 +310,19 @@ export default function ExamScreen() {
               <View style={styles.preExamInfoItem}>
                 <MaterialCommunityIcons name="timer" size={18} color="#94A3B8" />
                 <Text style={styles.preExamInfoText}>
-                  Timer: Total Time (90 min)
+                  Timer: Total Time ({paper?.duration_minutes || 90} min)
                 </Text>
               </View>
               <View style={styles.preExamInfoItem}>
                 <MaterialCommunityIcons name="check-circle" size={18} color="#94A3B8" />
                 <Text style={styles.preExamInfoText}>
                   +1 for correct, 0 for wrong
+                </Text>
+              </View>
+              <View style={styles.preExamInfoItem}>
+                <MaterialCommunityIcons name="auto-fix" size={18} color="#94A3B8" />
+                <Text style={styles.preExamInfoText}>
+                  Auto-advance after selecting answer
                 </Text>
               </View>
             </View>
@@ -339,6 +350,8 @@ export default function ExamScreen() {
   const currentQuestion = questions[currentQuestionIndex];
   const isBookmarked = bookmarkedQuestions.includes(currentQuestion?.id);
   const selectedAnswer = answers[currentQuestion?.id];
+  const answeredCount = Object.keys(answers).length;
+  const unansweredCount = questions.length - answeredCount;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -387,7 +400,11 @@ export default function ExamScreen() {
       >
         <View style={styles.questionHeader}>
           <View style={styles.questionBadges}>
-            <View style={styles.difficultyBadge}>
+            <View style={[
+              styles.difficultyBadge,
+              currentQuestion?.difficulty === 'hard' && styles.difficultyHard,
+              currentQuestion?.difficulty === 'easy' && styles.difficultyEasy,
+            ]}>
               <Text style={styles.difficultyText}>
                 {currentQuestion?.difficulty?.toUpperCase()}
               </Text>
@@ -487,6 +504,98 @@ export default function ExamScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Complete Test Confirmation Modal */}
+      <Modal
+        visible={showCompleteModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowCompleteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <MaterialCommunityIcons name="flag-checkered" size={48} color="#EF4444" />
+            <Text style={styles.confirmTitle}>Complete Test?</Text>
+            <Text style={styles.confirmText}>
+              You have answered {answeredCount} out of {questions.length} questions.
+            </Text>
+            {unansweredCount > 0 && (
+              <Text style={styles.confirmWarning}>
+                ⚠️ {unansweredCount} question{unansweredCount > 1 ? 's are' : ' is'} still unanswered!
+              </Text>
+            )}
+            <Text style={styles.confirmSubtext}>
+              This will be your final submission. Are you sure?
+            </Text>
+            
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity
+                style={styles.confirmCancelButton}
+                onPress={() => setShowCompleteModal(false)}
+              >
+                <Text style={styles.confirmCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.confirmSubmitButton}
+                onPress={handleConfirmComplete}
+              >
+                <Text style={styles.confirmSubmitText}>Submit Test</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Result Modal */}
+      <Modal
+        visible={showResultModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => {}}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.resultModal}>
+            <MaterialCommunityIcons 
+              name={finalResult && finalResult.scorePercentage >= 60 ? "trophy" : "school"} 
+              size={64} 
+              color={finalResult && finalResult.scorePercentage >= 60 ? "#F59E0B" : "#3B82F6"} 
+            />
+            <Text style={styles.resultTitle}>Test Completed!</Text>
+            
+            <View style={styles.scoreCircle}>
+              <Text style={styles.scorePercentage}>{finalResult?.scorePercentage}%</Text>
+              <Text style={styles.scoreLabel}>Score</Text>
+            </View>
+
+            <View style={styles.resultStats}>
+              <View style={styles.resultStatItem}>
+                <View style={[styles.resultStatDot, { backgroundColor: '#22C55E' }]} />
+                <Text style={styles.resultStatText}>Correct: {finalResult?.correct}</Text>
+              </View>
+              <View style={styles.resultStatItem}>
+                <View style={[styles.resultStatDot, { backgroundColor: '#EF4444' }]} />
+                <Text style={styles.resultStatText}>Wrong: {finalResult?.wrong}</Text>
+              </View>
+              <View style={styles.resultStatItem}>
+                <View style={[styles.resultStatDot, { backgroundColor: '#64748B' }]} />
+                <Text style={styles.resultStatText}>Skipped: {finalResult?.skipped}</Text>
+              </View>
+              <View style={styles.resultStatItem}>
+                <MaterialCommunityIcons name="clock-outline" size={16} color="#94A3B8" />
+                <Text style={styles.resultStatText}>Time: {finalResult?.timeTaken}</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.resultHomeButton}
+              onPress={() => router.replace('/')}
+            >
+              <MaterialCommunityIcons name="home" size={20} color="#FFFFFF" />
+              <Text style={styles.resultHomeText}>Go to Home</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Question Navigator Modal */}
       <Modal
         visible={showNavigator}
@@ -578,6 +687,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#94A3B8',
   },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  retryButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   preExamContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -631,23 +770,22 @@ const styles = StyleSheet.create({
   },
   preExamInfo: {
     width: '100%',
-    gap: 8,
     marginBottom: 24,
   },
   preExamInfoItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 8,
   },
   preExamInfoText: {
     fontSize: 14,
     color: '#94A3B8',
+    marginLeft: 8,
   },
   startButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
     backgroundColor: '#3B82F6',
     paddingVertical: 16,
     paddingHorizontal: 32,
@@ -659,6 +797,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
+    marginLeft: 8,
   },
   cancelButton: {
     paddingVertical: 12,
@@ -687,7 +826,6 @@ const styles = StyleSheet.create({
   questionCounter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
     backgroundColor: '#1E293B',
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -697,11 +835,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#F8FAFC',
+    marginRight: 8,
   },
   timerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     backgroundColor: '#1E3A5F',
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -714,6 +852,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#3B82F6',
+    marginLeft: 6,
   },
   timerTextWarning: {
     color: '#EF4444',
@@ -732,7 +871,6 @@ const styles = StyleSheet.create({
   },
   questionBadges: {
     flexDirection: 'row',
-    gap: 8,
     flexWrap: 'wrap',
     flex: 1,
   },
@@ -741,6 +879,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
+    marginRight: 8,
+  },
+  difficultyHard: {
+    backgroundColor: '#450A0A',
+  },
+  difficultyEasy: {
+    backgroundColor: '#14532D',
   },
   difficultyText: {
     fontSize: 10,
@@ -769,7 +914,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   optionsContainer: {
-    gap: 12,
+    marginBottom: 20,
   },
   optionButton: {
     flexDirection: 'row',
@@ -779,6 +924,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 2,
     borderColor: 'transparent',
+    marginBottom: 12,
   },
   optionSelected: {
     backgroundColor: '#1E3A5F',
@@ -826,7 +972,6 @@ const styles = StyleSheet.create({
   navButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
     paddingVertical: 10,
     paddingHorizontal: 16,
     backgroundColor: '#1E293B',
@@ -877,24 +1022,150 @@ const styles = StyleSheet.create({
   nextButtonTextDisabled: {
     color: '#475569',
   },
-  submitButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#22C55E',
-    borderRadius: 10,
-  },
-  submitButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confirmModal: {
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    width: '90%',
+    maxWidth: 360,
+  },
+  confirmTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  confirmText: {
+    fontSize: 15,
+    color: '#CBD5E1',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  confirmWarning: {
+    fontSize: 14,
+    color: '#F59E0B',
+    textAlign: 'center',
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  confirmSubtext: {
+    fontSize: 13,
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    width: '100%',
+  },
+  confirmCancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    backgroundColor: '#334155',
+    borderRadius: 10,
+    marginRight: 8,
+    alignItems: 'center',
+  },
+  confirmCancelText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#F8FAFC',
+  },
+  confirmSubmitButton: {
+    flex: 1,
+    paddingVertical: 14,
+    backgroundColor: '#EF4444',
+    borderRadius: 10,
+    marginLeft: 8,
+    alignItems: 'center',
+  },
+  confirmSubmitText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  resultModal: {
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    width: '90%',
+    maxWidth: 360,
+  },
+  resultTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    marginTop: 16,
+    marginBottom: 20,
+  },
+  scoreCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#0F172A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: '#3B82F6',
+    marginBottom: 24,
+  },
+  scorePercentage: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#3B82F6',
+  },
+  scoreLabel: {
+    fontSize: 12,
+    color: '#94A3B8',
+    marginTop: 2,
+  },
+  resultStats: {
+    width: '100%',
+    backgroundColor: '#0F172A',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+  },
+  resultStatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  resultStatDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  resultStatText: {
+    fontSize: 14,
+    color: '#CBD5E1',
+    marginLeft: 4,
+  },
+  resultHomeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#3B82F6',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    width: '100%',
+  },
+  resultHomeText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 8,
   },
   navigatorModal: {
     backgroundColor: '#1E293B',
@@ -902,6 +1173,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     maxHeight: '80%',
     padding: 20,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   navigatorHeader: {
     flexDirection: 'row',
@@ -925,12 +1200,12 @@ const styles = StyleSheet.create({
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   legendDot: {
     width: 12,
     height: 12,
     borderRadius: 3,
+    marginRight: 6,
   },
   legendAnswered: {
     backgroundColor: '#22C55E',
@@ -951,7 +1226,6 @@ const styles = StyleSheet.create({
   questionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   gridItem: {
     width: (width - 80) / 8,
@@ -960,6 +1234,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
     justifyContent: 'center',
     alignItems: 'center',
+    margin: 4,
   },
   gridItemAnswered: {
     backgroundColor: '#22C55E',
