@@ -125,6 +125,58 @@ export default function ExamScreen() {
     setBookmarkedQuestions([]);
   }, []);
 
+  const handleCompleteTest = useCallback(() => {
+    if (!questions || questions.length === 0) return;
+
+    const answeredCount = Object.keys(answers).length;
+    const unansweredCount = questions.length - answeredCount;
+
+    Alert.alert(
+      'Complete Test',
+      `You have answered ${answeredCount} out of ${questions.length} questions.\n\n${unansweredCount > 0 ? `${unansweredCount} questions are still unanswered.\n\n` : ''}This would be your final submission. Are you sure you want to submit the test and see the results?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Submit Test',
+          style: 'destructive',
+          onPress: () => {
+            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+            
+            // Calculate score
+            let correct = 0;
+            let wrong = 0;
+            let skipped = 0;
+            
+            questions.forEach((q) => {
+              if (answers[q.id] !== undefined) {
+                if (answers[q.id] === q.correct_option) {
+                  correct++;
+                } else {
+                  wrong++;
+                }
+              } else {
+                skipped++;
+              }
+            });
+            
+            const scorePercentage = Math.round((correct / questions.length) * 100);
+
+            Alert.alert(
+              'Test Completed!',
+              `Your Score: ${scorePercentage}%\n\nCorrect: ${correct}\nWrong: ${wrong}\nSkipped: ${skipped}\nTime Taken: ${formatTime(timeTaken)}`,
+              [
+                {
+                  text: 'View Results',
+                  onPress: () => router.replace('/'),
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  }, [questions, answers, startTime, router]);
+
   const handleSubmit = useCallback(() => {
     if (!questions || questions.length === 0) return;
 
