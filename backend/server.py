@@ -615,6 +615,92 @@ async def seed_database():
         logger.error(f"Error seeding database: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/reseed")
+async def reseed_database():
+    """Clear and reseed the database with fresh questions from real PYQ database"""
+    try:
+        logger.info("Clearing existing data...")
+        
+        # Clear all collections
+        await db.subjects.delete_many({})
+        await db.papers.delete_many({})
+        await db.questions.delete_many({})
+        await db.attempts.delete_many({})
+        await db.settings.delete_many({})
+        
+        logger.info("Starting fresh database seeding with real PYQs...")
+        
+        # Seed subjects
+        subjects_created = []
+        for subject_data in SUBJECTS_DATA:
+            subject = Subject(**subject_data)
+            await db.subjects.insert_one(subject.dict())
+            subjects_created.append(subject)
+            logger.info(f"Created subject: {subject.name}")
+        
+        # Seed papers and questions for each subject
+        total_papers = 0
+        total_questions = 0
+        
+        for subject in subjects_created:
+            # Create 20 practice papers
+            for paper_num in range(1, 21):
+                paper = Paper(
+                    subject_id=subject.id,
+                    paper_number=paper_num,
+                    is_master=False,
+                    title=f"{subject.name} Practice Paper {paper_num}",
+                    total_questions=100,
+                    duration_minutes=90
+                )
+                await db.papers.insert_one(paper.dict())
+                total_papers += 1
+                
+                # Generate questions for this paper using real PYQs
+                questions = generate_questions_for_subject(
+                    subject.name, paper.id, subject.id, 100, False
+                )
+                if questions:
+                    await db.questions.insert_many(questions)
+                    total_questions += len(questions)
+            
+            # Create 1 master sample paper
+            master_paper = Paper(
+                subject_id=subject.id,
+                paper_number=0,
+                is_master=True,
+                title=f"{subject.name} Master Prediction Paper",
+                total_questions=100,
+                duration_minutes=90
+            )
+            await db.papers.insert_one(master_paper.dict())
+            total_papers += 1
+            
+            # Generate master questions (higher difficulty)
+            master_questions = generate_questions_for_subject(
+                subject.name, master_paper.id, subject.id, 100, True
+            )
+            if master_questions:
+                await db.questions.insert_many(master_questions)
+                total_questions += len(master_questions)
+            
+            logger.info(f"Seeded papers and questions for: {subject.name}")
+        
+        # Create default settings
+        default_settings = UserSettings()
+        await db.settings.insert_one(default_settings.dict())
+        
+        return {
+            "message": "Database reseeded successfully with real PYQs",
+            "subjects": len(subjects_created),
+            "papers": total_papers,
+            "questions": total_questions
+        }
+        
+    except Exception as e:
+        logger.error(f"Error reseeding database: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/attempt/{attempt_id}/review")
 async def get_attempt_review(attempt_id: str):
     """Get detailed review of an attempt with correct answers"""
