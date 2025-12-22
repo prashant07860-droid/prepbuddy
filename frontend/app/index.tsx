@@ -172,37 +172,40 @@ export default function HomeScreen() {
   }, []);
 
   const renderSubjectCard = (subject: Subject) => (
-    <TouchableOpacity
+    <Link
       key={subject.id}
-      style={[styles.subjectCard, { borderLeftColor: subject.color }]}
-      onPress={() => router.push(`/subject/${subject.id}`)}
-      activeOpacity={0.7}
+      href={`/subject/${subject.id}`}
+      asChild
     >
-      <View style={[styles.iconContainer, { backgroundColor: subject.color + '20' }]}>
-        <MaterialCommunityIcons
-          name={ICON_MAP[subject.icon] || 'book'}
-          size={28}
-          color={subject.color}
-        />
-      </View>
-      <View style={styles.cardContent}>
-        <Text style={styles.subjectName}>{subject.name}</Text>
-        <Text style={styles.subjectDescription} numberOfLines={2}>
-          {subject.description}
-        </Text>
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <MaterialCommunityIcons name="file-document-outline" size={14} color="#94A3B8" />
-            <Text style={styles.statText}>{subject.total_papers} Papers</Text>
-          </View>
-          <View style={styles.statItem}>
-            <MaterialCommunityIcons name="help-circle-outline" size={14} color="#94A3B8" />
-            <Text style={styles.statText}>{subject.total_questions} MCQs</Text>
+      <Pressable
+        style={[styles.subjectCard, { borderLeftColor: subject.color }]}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: subject.color + '20' }]}>
+          <MaterialCommunityIcons
+            name={ICON_MAP[subject.icon] || 'book'}
+            size={28}
+            color={subject.color}
+          />
+        </View>
+        <View style={styles.cardContent}>
+          <Text style={styles.subjectName}>{subject.name}</Text>
+          <Text style={styles.subjectDescription} numberOfLines={2}>
+            {subject.description}
+          </Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <MaterialCommunityIcons name="file-document-outline" size={14} color="#94A3B8" />
+              <Text style={styles.statText}>{subject.total_papers} Papers</Text>
+            </View>
+            <View style={styles.statItem}>
+              <MaterialCommunityIcons name="help-circle-outline" size={14} color="#94A3B8" />
+              <Text style={styles.statText}>{subject.total_questions} MCQs</Text>
+            </View>
           </View>
         </View>
-      </View>
-      <MaterialCommunityIcons name="chevron-right" size={24} color="#64748B" />
-    </TouchableOpacity>
+        <MaterialCommunityIcons name="chevron-right" size={24} color="#64748B" />
+      </Pressable>
+    </Link>
   );
 
   if (isLoading && subjects.length === 0) {
