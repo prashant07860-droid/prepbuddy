@@ -319,6 +319,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 8,
   },
+  profileButtonActive: {
+    borderWidth: 2,
+    borderColor: '#22C55E',
+  },
   scrollView: {
     flex: 1,
   },
