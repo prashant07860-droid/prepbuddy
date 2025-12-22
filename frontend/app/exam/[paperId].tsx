@@ -835,6 +835,40 @@ const styles = StyleSheet.create({
   navButtonTextDisabled: {
     color: '#475569',
   },
+  completeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: '#EF4444',
+    borderRadius: 10,
+  },
+  completeButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 6,
+  },
+  nextButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: '#22C55E',
+    borderRadius: 10,
+  },
+  nextButtonDisabled: {
+    backgroundColor: '#1E293B',
+  },
+  nextButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginRight: 4,
+  },
+  nextButtonTextDisabled: {
+    color: '#475569',
+  },
   submitButton: {
     flexDirection: 'row',
     alignItems: 'center',
