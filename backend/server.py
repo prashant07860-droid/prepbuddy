@@ -1,18 +1,27 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
+import hashlib
+import jwt
+import secrets
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# JWT Configuration
+JWT_SECRET = os.environ.get('JWT_SECRET', secrets.token_hex(32))
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_HOURS = 72
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -25,12 +34,102 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Security
+security = HTTPBearer(auto_error=False)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# ============ AUTH HELPERS ============
+
+def hash_password(password: str) -> str:
+    """Hash password using SHA256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(password: str, hashed: str) -> bool:
+    """Verify password against hash"""
+    return hash_password(password) == hashed
+
+def create_token(user_id: str, email: str) -> str:
+    """Create JWT token"""
+    payload = {
+        "user_id": user_id,
+        "email": email,
+        "exp": datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def decode_token(token: str) -> Optional[Dict]:
+    """Decode JWT token"""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Optional[Dict]:
+    """Get current user from token, returns None for guest users"""
+    if not credentials:
+        return None
+    
+    payload = decode_token(credentials.credentials)
+    if not payload:
+        return None
+    
+    user = await db.users.find_one({"id": payload["user_id"]})
+    if user:
+        user.pop('_id', None)
+        user.pop('password', None)
+    return user
+
+async def get_user_id(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    """Get user ID from token or return guest ID"""
+    if not credentials:
+        return "guest_user"
+    
+    payload = decode_token(credentials.credentials)
+    if not payload:
+        return "guest_user"
+    
+    return payload.get("user_id", "guest_user")
+
+# ============ AUTH MODELS ============
+
+class UserRegister(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: str
+    password: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    total_attempts: int = 0
+    total_correct: int = 0
+    total_questions_attempted: int = 0
+
+class UserProfile(BaseModel):
+    id: str
+    name: str
+    email: str
+    created_at: datetime
+    total_attempts: int
+    total_correct: int
+    total_questions_attempted: int
+    overall_accuracy: float
+    subject_progress: List[Dict]
 
 # ============ MODELS ============
 
