@@ -9,15 +9,65 @@ import {
   Alert,
   Dimensions,
   Modal,
+  Pressable,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useRouter, useLocalSearchParams, Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { fetchPaper, fetchQuestions, submitAttempt, fetchSettings, Question } from '../../src/api';
-import { useExamStore } from '../../src/store';
 
 const { width } = Dimensions.get('window');
+
+interface Question {
+  id: string;
+  paper_id: string;
+  subject_id: string;
+  question_number: number;
+  question_text: string;
+  options: string[];
+  correct_option: number;
+  explanation?: string;
+  difficulty: string;
+  topic: string;
+}
+
+interface Paper {
+  id: string;
+  subject_id: string;
+  paper_number: number;
+  is_master: boolean;
+  title: string;
+  total_questions: number;
+  duration_minutes: number;
+}
+
+// Sample questions generator
+const generateSampleQuestions = (paperId: string, count: number = 100): Question[] => {
+  const questions: Question[] = [];
+  const topics = ['Constitution', 'Governance', 'Rights', 'Duties', 'Institutions', 'Parliament', 'Judiciary'];
+  const difficulties = ['easy', 'medium', 'hard'];
+  
+  for (let i = 1; i <= count; i++) {
+    questions.push({
+      id: `${paperId}-q-${i}`,
+      paper_id: paperId,
+      subject_id: '',
+      question_number: i,
+      question_text: `Sample Question ${i}: Which of the following statements is correct regarding the ${topics[i % topics.length]}?`,
+      options: [
+        `Option A - Related to ${topics[i % topics.length]}`,
+        `Option B - Alternative answer`,
+        `Option C - Another possibility`,
+        `Option D - Different perspective`,
+      ],
+      correct_option: i % 4,
+      explanation: `This question tests knowledge of ${topics[i % topics.length]}. The correct answer demonstrates understanding of key concepts.`,
+      difficulty: difficulties[i % 3],
+      topic: topics[i % topics.length],
+    });
+  }
+  
+  return questions;
+};
 
 export default function ExamScreen() {
   const router = useRouter();
@@ -27,102 +77,90 @@ export default function ExamScreen() {
   const [examStarted, setExamStarted] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
 
-  const {
-    currentQuestionIndex,
-    answers,
-    bookmarkedQuestions,
-    timeRemaining,
-    isExamActive,
-    timerMode,
-    showTimer,
-    setCurrentQuestion,
-    setAnswer,
-    toggleBookmark,
-    setTimeRemaining,
-    startExam,
-    endExam,
-    resetExam,
-  } = useExamStore();
+  // State management
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<string[]>([]);
+  const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
+  const [timerMode, setTimerMode] = useState<'total' | 'per_question'>('total');
+  const [showTimer, setShowTimerState] = useState(true);
 
-  const { data: paper, isLoading: paperLoading } = useQuery({
-    queryKey: ['paper', paperId],
-    queryFn: () => fetchPaper(paperId!),
-    enabled: !!paperId,
-  });
+  // Initialize questions
+  const [questions, setQuestions] = useState<Question[]>(() => 
+    paperId ? generateSampleQuestions(paperId) : []
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: questions, isLoading: questionsLoading } = useQuery({
-    queryKey: ['questions', paperId],
-    queryFn: () => fetchQuestions(paperId!),
-    enabled: !!paperId,
-  });
-
-  const { data: settings } = useQuery({
-    queryKey: ['settings'],
-    queryFn: fetchSettings,
-  });
-
-  const submitMutation = useMutation({
-    mutationFn: submitAttempt,
-    onSuccess: (data) => {
-      endExam();
-      router.replace(`/results/${data.id}`);
-    },
-    onError: (error) => {
-      Alert.alert('Error', 'Failed to submit exam. Please try again.');
-    },
-  });
+  // Get paper info from paperId
+  const getPaperTitle = () => {
+    if (!paperId) return 'Exam';
+    if (paperId.includes('master')) return 'Master Prediction Paper';
+    const match = paperId.match(/practice-(\d+)/);
+    if (match) return `Practice Paper ${match[1]}`;
+    return 'Exam';
+  };
 
   // Timer effect
   useEffect(() => {
-    if (!isExamActive || !showTimer) return;
+    if (!examStarted || !showTimer) return;
 
     const interval = setInterval(() => {
-      setTimeRemaining(Math.max(0, timeRemaining - 1));
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
-    if (timeRemaining <= 0) {
-      handleSubmit();
-    }
-
     return () => clearInterval(interval);
-  }, [isExamActive, timeRemaining, showTimer]);
+  }, [examStarted, showTimer]);
 
   const handleStartExam = useCallback(() => {
-    const mode = settings?.timer_mode || 'total';
-    const totalSeconds = mode === 'total'
-      ? (settings?.total_time_minutes || 90) * 60
-      : (settings?.per_question_seconds || 60) * (questions?.length || 100);
-
-    startExam(totalSeconds, mode);
     setExamStarted(true);
     setStartTime(Date.now());
-  }, [settings, questions, startExam]);
+    setTimeRemaining(5400); // 90 minutes
+    setAnswers({});
+    setCurrentQuestionIndex(0);
+    setBookmarkedQuestions([]);
+  }, []);
 
   const handleSubmit = useCallback(() => {
-    if (!paper || !questions) return;
+    if (!questions || questions.length === 0) return;
 
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+    
+    // Calculate score
+    let correct = 0;
+    let wrong = 0;
+    let skipped = 0;
+    
+    questions.forEach((q) => {
+      if (answers[q.id] !== undefined) {
+        if (answers[q.id] === q.correct_option) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      } else {
+        skipped++;
+      }
+    });
+    
+    const scorePercentage = Math.round((correct / questions.length) * 100);
 
     Alert.alert(
-      'Submit Exam',
-      `You have answered ${Object.keys(answers).length} out of ${questions.length} questions. Are you sure you want to submit?`,
+      'Exam Submitted!',
+      `Score: ${scorePercentage}%\nCorrect: ${correct}\nWrong: ${wrong}\nSkipped: ${skipped}\nTime: ${formatTime(timeTaken)}`,
       [
-        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Submit',
-          onPress: () => {
-            submitMutation.mutate({
-              paper_id: paper.id,
-              subject_id: paper.subject_id,
-              answers,
-              time_taken_seconds: timeTaken,
-              timer_mode: timerMode,
-            });
-          },
+          text: 'OK',
+          onPress: () => router.replace('/'),
         },
       ]
     );
-  }, [paper, questions, answers, startTime, timerMode]);
+  }, [questions, answers, startTime, router]);
 
   const handleExit = () => {
     Alert.alert(
@@ -133,10 +171,7 @@ export default function ExamScreen() {
         {
           text: 'Exit',
           style: 'destructive',
-          onPress: () => {
-            resetExam();
-            router.back();
-          },
+          onPress: () => router.back(),
         },
       ]
     );
@@ -153,30 +188,28 @@ export default function ExamScreen() {
   };
 
   const goToQuestion = (index: number) => {
-    setCurrentQuestion(index);
+    setCurrentQuestionIndex(index);
     setShowNavigator(false);
   };
 
-  if (paperLoading || questionsLoading) {
+  const setAnswer = (questionId: string, optionIndex: number) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
+  };
+
+  const toggleBookmark = (questionId: string) => {
+    setBookmarkedQuestions((prev) =>
+      prev.includes(questionId)
+        ? prev.filter((id) => id !== questionId)
+        : [...prev, questionId]
+    );
+  };
+
+  if (!questions || questions.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Loading exam...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!questions || questions.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorContainer}>
-          <MaterialCommunityIcons name="alert-circle" size={48} color="#EF4444" />
-          <Text style={styles.errorText}>No questions found</Text>
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backBtnText}>Go Back</Text>
-          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -189,11 +222,11 @@ export default function ExamScreen() {
         <View style={styles.preExamContainer}>
           <View style={styles.preExamCard}>
             <MaterialCommunityIcons
-              name={paper?.is_master ? 'star' : 'file-document'}
+              name={paperId?.includes('master') ? 'star' : 'file-document'}
               size={48}
-              color={paper?.is_master ? '#F59E0B' : '#3B82F6'}
+              color={paperId?.includes('master') ? '#F59E0B' : '#3B82F6'}
             />
-            <Text style={styles.preExamTitle}>{paper?.title}</Text>
+            <Text style={styles.preExamTitle}>{getPaperTitle()}</Text>
             
             <View style={styles.preExamStats}>
               <View style={styles.preExamStat}>
@@ -204,7 +237,7 @@ export default function ExamScreen() {
               <View style={styles.preExamStatDivider} />
               <View style={styles.preExamStat}>
                 <MaterialCommunityIcons name="clock" size={24} color="#64748B" />
-                <Text style={styles.preExamStatValue}>{paper?.duration_minutes}</Text>
+                <Text style={styles.preExamStatValue}>90</Text>
                 <Text style={styles.preExamStatLabel}>Minutes</Text>
               </View>
             </View>
@@ -213,7 +246,7 @@ export default function ExamScreen() {
               <View style={styles.preExamInfoItem}>
                 <MaterialCommunityIcons name="timer" size={18} color="#94A3B8" />
                 <Text style={styles.preExamInfoText}>
-                  Timer: {settings?.timer_mode === 'per_question' ? 'Per Question' : 'Total Time'}
+                  Timer: Total Time (90 min)
                 </Text>
               </View>
               <View style={styles.preExamInfoItem}>
@@ -485,28 +518,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#94A3B8',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#94A3B8',
-  },
-  backBtn: {
-    marginTop: 16,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#3B82F6',
-    borderRadius: 8,
-  },
-  backBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
   },
   preExamContainer: {
     flex: 1,
