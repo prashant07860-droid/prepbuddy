@@ -256,6 +256,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 24,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: 420,
   },
   header: {
     alignItems: 'center',
@@ -285,6 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
+    width: '100%',
   },
   formTitle: {
     fontSize: 22,
