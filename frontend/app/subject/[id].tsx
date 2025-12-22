@@ -6,10 +6,24 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+// Get API base URL - use environment variable or fallback to relative path
+const getApiBaseUrl = () => {
+  if (Platform.OS === 'web') {
+    // On web, try to use the backend URL from environment
+    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (backendUrl) {
+      return backendUrl;
+    }
+  }
+  // Fallback to relative path
+  return '';
+};
 
 interface Paper {
   id: string;
