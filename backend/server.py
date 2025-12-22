@@ -1025,7 +1025,7 @@ async def seed_database():
 
 @api_router.post("/reseed")
 async def reseed_database():
-    """Clear and reseed the database with fresh questions from real PYQ database"""
+    """Clear and reseed the database with fresh questions from real PYQ database including extreme papers"""
     try:
         logger.info("Clearing existing data...")
         
@@ -1036,7 +1036,7 @@ async def reseed_database():
         await db.attempts.delete_many({})
         await db.settings.delete_many({})
         
-        logger.info("Starting fresh database seeding with real PYQs...")
+        logger.info("Starting fresh database seeding with real PYQs and extreme papers...")
         
         # Seed subjects
         subjects_created = []
@@ -1072,6 +1072,29 @@ async def reseed_database():
                     await db.questions.insert_many(questions)
                     total_questions += len(questions)
             
+            # Create 5 EXTREME difficulty papers (numbered 21-25)
+            for extreme_num in range(1, 6):
+                extreme_paper = Paper(
+                    subject_id=subject.id,
+                    paper_number=20 + extreme_num,  # Papers 21-25
+                    is_master=False,
+                    title=f"Practice Paper {20 + extreme_num} (Extreme)",
+                    total_questions=100,
+                    duration_minutes=90
+                )
+                await db.papers.insert_one(extreme_paper.dict())
+                total_papers += 1
+                
+                # Generate extreme difficulty questions
+                extreme_questions = generate_extreme_questions_for_subject(
+                    subject.name, extreme_paper.id, subject.id, 100
+                )
+                if extreme_questions:
+                    await db.questions.insert_many(extreme_questions)
+                    total_questions += len(extreme_questions)
+                
+                logger.info(f"Created extreme paper {extreme_num} for: {subject.name}")
+            
             # Create 1 master sample paper
             master_paper = Paper(
                 subject_id=subject.id,
@@ -1092,17 +1115,18 @@ async def reseed_database():
                 await db.questions.insert_many(master_questions)
                 total_questions += len(master_questions)
             
-            logger.info(f"Seeded papers and questions for: {subject.name}")
+            logger.info(f"Seeded all papers for: {subject.name}")
         
         # Create default settings
         default_settings = UserSettings()
         await db.settings.insert_one(default_settings.dict())
         
         return {
-            "message": "Database reseeded successfully with real PYQs",
+            "message": "Database reseeded successfully with real PYQs and extreme papers",
             "subjects": len(subjects_created),
             "papers": total_papers,
-            "questions": total_questions
+            "questions": total_questions,
+            "extreme_papers_per_subject": 5
         }
         
     except Exception as e:
