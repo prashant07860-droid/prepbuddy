@@ -6,9 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Pressable,
 } from 'react-native';
-import { useRouter, useLocalSearchParams, Link } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -128,58 +127,61 @@ export default function SubjectScreen() {
     return Math.max(...paperAttempts.map((a) => a.score_percentage));
   };
 
+  const navigateToPaper = (paperId: string) => {
+    router.push(`/exam/${paperId}`);
+  };
+
   const renderPaperCard = (paper: Paper) => {
     const bestScore = getBestScore(paper.id);
     const hasAttempt = bestScore !== null;
 
     return (
-      <Link
+      <TouchableOpacity
         key={paper.id}
-        href={`/exam/${paper.id}`}
-        asChild
+        style={styles.paperCard}
+        onPress={() => navigateToPaper(paper.id)}
+        activeOpacity={0.7}
       >
-        <Pressable style={styles.paperCard}>
-          <View style={styles.paperLeft}>
-            <View style={[styles.paperIcon, paper.is_master && styles.masterIcon]}>
-              <MaterialCommunityIcons
-                name={paper.is_master ? 'star' : 'file-document'}
-                size={20}
-                color={paper.is_master ? '#F59E0B' : '#3B82F6'}
-              />
-            </View>
-            <View style={styles.paperInfo}>
-              <Text style={styles.paperTitle}>{paper.title}</Text>
-              <View style={styles.paperMeta}>
-                <Text style={styles.paperMetaText}>
-                  {paper.total_questions} Questions
-                </Text>
-                <Text style={styles.paperMetaDot}>•</Text>
-                <Text style={styles.paperMetaText}>
-                  {paper.duration_minutes} min
-                </Text>
-              </View>
+        <View style={styles.paperLeft}>
+          <View style={[styles.paperIcon, paper.is_master && styles.masterIcon]}>
+            <MaterialCommunityIcons
+              name={paper.is_master ? 'star' : 'file-document'}
+              size={20}
+              color={paper.is_master ? '#F59E0B' : '#3B82F6'}
+            />
+          </View>
+          <View style={styles.paperInfo}>
+            <Text style={styles.paperTitle}>{paper.title}</Text>
+            <View style={styles.paperMeta}>
+              <Text style={styles.paperMetaText}>
+                {paper.total_questions} Questions
+              </Text>
+              <Text style={styles.paperMetaDot}>•</Text>
+              <Text style={styles.paperMetaText}>
+                {paper.duration_minutes} min
+              </Text>
             </View>
           </View>
-          <View style={styles.paperRight}>
-            {hasAttempt ? (
-              <View style={styles.scoreContainer}>
-                <Text style={[
-                  styles.scoreText,
-                  bestScore! >= 70 ? styles.scoreGood : bestScore! >= 40 ? styles.scoreMedium : styles.scoreLow
-                ]}>
-                  {bestScore}%
-                </Text>
-                <Text style={styles.scoreBest}>Best</Text>
-              </View>
-            ) : (
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>NEW</Text>
-              </View>
-            )}
-            <MaterialCommunityIcons name="chevron-right" size={20} color="#64748B" />
-          </View>
-        </Pressable>
-      </Link>
+        </View>
+        <View style={styles.paperRight}>
+          {hasAttempt ? (
+            <View style={styles.scoreContainer}>
+              <Text style={[
+                styles.scoreText,
+                bestScore! >= 70 ? styles.scoreGood : bestScore! >= 40 ? styles.scoreMedium : styles.scoreLow
+              ]}>
+                {bestScore}%
+              </Text>
+              <Text style={styles.scoreBest}>Best</Text>
+            </View>
+          ) : (
+            <View style={styles.newBadge}>
+              <Text style={styles.newBadgeText}>NEW</Text>
+            </View>
+          )}
+          <MaterialCommunityIcons name="chevron-right" size={20} color="#64748B" />
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -298,17 +300,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    gap: 12,
   },
   tab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: '#1E293B',
+    marginHorizontal: 6,
   },
   tabActive: {
     backgroundColor: '#1E3A5F',
@@ -317,6 +318,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#64748B',
+    marginLeft: 8,
   },
   tabTextActive: {
     color: '#F8FAFC',
@@ -336,7 +338,6 @@ const styles = StyleSheet.create({
   masterInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
     backgroundColor: '#422006',
     padding: 16,
     borderRadius: 12,
@@ -347,6 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#FCD34D',
     lineHeight: 18,
+    marginLeft: 12,
   },
   paperCard: {
     flexDirection: 'row',
@@ -399,10 +401,10 @@ const styles = StyleSheet.create({
   paperRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   scoreContainer: {
     alignItems: 'flex-end',
+    marginRight: 8,
   },
   scoreText: {
     fontSize: 16,
@@ -426,6 +428,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
+    marginRight: 8,
   },
   newBadgeText: {
     fontSize: 10,
