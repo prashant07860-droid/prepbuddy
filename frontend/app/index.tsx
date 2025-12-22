@@ -238,7 +238,9 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeText}>OPSC Exam Prep</Text>
-          <Text style={styles.subtitle}>Master your preparation</Text>
+          <Text style={styles.subtitle}>
+            {user ? `Welcome, ${user.name}` : isGuest ? 'Guest Mode' : 'Master your preparation'}
+          </Text>
         </View>
         <View style={styles.headerButtons}>
           <TouchableOpacity
@@ -248,10 +250,14 @@ export default function HomeScreen() {
             <MaterialCommunityIcons name="chart-box" size={24} color="#3B82F6" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => router.push('/settings')}
+            style={[styles.headerButton, user && styles.profileButtonActive]}
+            onPress={() => router.push('/profile')}
           >
-            <MaterialCommunityIcons name="cog" size={24} color="#94A3B8" />
+            <MaterialCommunityIcons 
+              name={user ? 'account' : 'account-outline'} 
+              size={24} 
+              color={user ? '#22C55E' : '#94A3B8'} 
+            />
           </TouchableOpacity>
         </View>
       </View>
