@@ -221,23 +221,24 @@ export default function AuthScreen() {
                 </Text>
               </Text>
             </TouchableOpacity>
-          </View>
-
-          {/* Guest Mode */}
-          <View style={styles.guestContainer}>
-            <View style={styles.dividerContainer}>
-              <View style={styles.divider} />
-              <Text style={styles.dividerText}>OR</Text>
-              <View style={styles.divider} />
             </View>
 
-            <TouchableOpacity style={styles.guestButton} onPress={handleGuestMode}>
-              <MaterialCommunityIcons name="account-outline" size={20} color="#94A3B8" />
-              <Text style={styles.guestButtonText}>Continue as Guest</Text>
-            </TouchableOpacity>
-            <Text style={styles.guestNote}>
-              Progress won't be saved in guest mode
-            </Text>
+            {/* Guest Mode */}
+            <View style={styles.guestContainer}>
+              <View style={styles.dividerContainer}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.divider} />
+              </View>
+
+              <TouchableOpacity style={styles.guestButton} onPress={handleGuestMode}>
+                <MaterialCommunityIcons name="account-outline" size={20} color="#94A3B8" />
+                <Text style={styles.guestButtonText}>Continue as Guest</Text>
+              </TouchableOpacity>
+              <Text style={styles.guestNote}>
+                Progress won't be saved in guest mode
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
