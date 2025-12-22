@@ -7,10 +7,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Platform,
-  Pressable,
 } from 'react-native';
-import { useRouter, Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -38,109 +36,111 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
   newspaper: 'newspaper',
 };
 
+const INITIAL_SUBJECTS: Subject[] = [
+  {
+    id: 'bf517fa7-5aac-4639-8363-2aeaa198b915',
+    name: 'Polity',
+    description: 'Constitution of India, governance, rights, duties, institutions',
+    icon: 'bank',
+    color: '#3B82F6',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: 'a41db799-f11b-44cb-b987-c8b744353ee9',
+    name: 'Geography',
+    description: 'Physical Geography, Indian Geography, Odisha Geography',
+    icon: 'earth',
+    color: '#10B981',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: 'bb219476-4e4c-4337-ac93-0022a1b0116f',
+    name: 'History of Modern India',
+    description: 'Freedom struggle, reforms, movements (1757-1947)',
+    icon: 'book-open-variant',
+    color: '#F59E0B',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: '0e3373c7-aee7-433c-9922-ff1da0806a3f',
+    name: 'Ethics',
+    description: 'Ethics & Human Values, integrity, aptitude, moral thinkers',
+    icon: 'scale-balance',
+    color: '#8B5CF6',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: 'c32206e4-4f15-4c7e-a6c7-227361d90a76',
+    name: 'Science and Technology',
+    description: 'General science, emerging technologies, space, defence',
+    icon: 'atom',
+    color: '#EC4899',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: '138bb0a1-4b12-4eac-838b-b02d7ba2f192',
+    name: 'Economics',
+    description: 'Indian economy basics, growth, inflation, budgeting',
+    icon: 'chart-line',
+    color: '#06B6D4',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: 'da991167-40b5-43d6-b8fd-4b913d3da04a',
+    name: 'Environment and Ecology',
+    description: 'Ecology basics, climate change, environmental laws',
+    icon: 'leaf',
+    color: '#22C55E',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: '5cf4e1e2-2d0a-41df-b06b-1a7ed058278d',
+    name: 'Ancient & Medieval History',
+    description: 'Pre-independence Indian history, dynasties, culture',
+    icon: 'castle',
+    color: '#D97706',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: 'ff1a2f17-6ca0-4c83-b58d-22b3280b4f04',
+    name: 'Indian Society',
+    description: 'Social structure, issues, diversity, communalism',
+    icon: 'account-group',
+    color: '#EF4444',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: '6d0a547e-ed97-4741-ba10-8c9d2a3aed2f',
+    name: 'Odisha Studies',
+    description: 'History & culture of Odisha, economy, state schemes',
+    icon: 'map-marker',
+    color: '#7C3AED',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+  {
+    id: '8b5a7f40-4cec-45fb-a2c6-80bbb339a5b7',
+    name: 'Current Affairs',
+    description: 'National, International current events',
+    icon: 'newspaper',
+    color: '#0EA5E9',
+    total_papers: 20,
+    total_questions: 2000,
+  },
+];
+
 export default function HomeScreen() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<Subject[]>([
-    {
-      id: 'bf517fa7-5aac-4639-8363-2aeaa198b915',
-      name: 'Polity',
-      description: 'Constitution of India, governance, rights, duties, institutions',
-      icon: 'bank',
-      color: '#3B82F6',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: 'a41db799-f11b-44cb-b987-c8b744353ee9',
-      name: 'Geography',
-      description: 'Physical Geography, Indian Geography, Odisha Geography',
-      icon: 'earth',
-      color: '#10B981',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: 'bb219476-4e4c-4337-ac93-0022a1b0116f',
-      name: 'History of Modern India',
-      description: 'Freedom struggle, reforms, movements (1757-1947)',
-      icon: 'book-open-variant',
-      color: '#F59E0B',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: '0e3373c7-aee7-433c-9922-ff1da0806a3f',
-      name: 'Ethics',
-      description: 'Ethics & Human Values, integrity, aptitude, moral thinkers',
-      icon: 'scale-balance',
-      color: '#8B5CF6',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: 'c32206e4-4f15-4c7e-a6c7-227361d90a76',
-      name: 'Science and Technology',
-      description: 'General science, emerging technologies, space, defence',
-      icon: 'atom',
-      color: '#EC4899',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: '138bb0a1-4b12-4eac-838b-b02d7ba2f192',
-      name: 'Economics',
-      description: 'Indian economy basics, growth, inflation, budgeting',
-      icon: 'chart-line',
-      color: '#06B6D4',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: 'da991167-40b5-43d6-b8fd-4b913d3da04a',
-      name: 'Environment and Ecology',
-      description: 'Ecology basics, climate change, environmental laws',
-      icon: 'leaf',
-      color: '#22C55E',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: '5cf4e1e2-2d0a-41df-b06b-1a7ed058278d',
-      name: 'Ancient & Medieval History',
-      description: 'Pre-independence Indian history, dynasties, culture',
-      icon: 'castle',
-      color: '#D97706',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: 'ff1a2f17-6ca0-4c83-b58d-22b3280b4f04',
-      name: 'Indian Society',
-      description: 'Social structure, issues, diversity, communalism',
-      icon: 'account-group',
-      color: '#EF4444',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: '6d0a547e-ed97-4741-ba10-8c9d2a3aed2f',
-      name: 'Odisha Studies',
-      description: 'History & culture of Odisha, economy, state schemes',
-      icon: 'map-marker',
-      color: '#7C3AED',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-    {
-      id: '8b5a7f40-4cec-45fb-a2c6-80bbb339a5b7',
-      name: 'Current Affairs',
-      description: 'National, International current events',
-      icon: 'newspaper',
-      color: '#0EA5E9',
-      total_papers: 20,
-      total_questions: 2000,
-    },
-  ]);
+  const [subjects, setSubjects] = useState<Subject[]>(INITIAL_SUBJECTS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -155,69 +155,60 @@ export default function HomeScreen() {
         throw new Error(`Failed to fetch subjects: ${response.status}`);
       }
       const data = await response.json();
-      setSubjects(data);
+      if (data && data.length > 0) {
+        setSubjects(data);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      // Keep initial data on error
+      console.log('Using initial data');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Client-side only data fetching using useEffect
   useEffect(() => {
-    // Only run on client
     if (typeof window !== 'undefined') {
       fetchSubjects();
     }
   }, []);
 
+  const navigateToSubject = (subjectId: string) => {
+    router.push(`/subject/${subjectId}`);
+  };
+
   const renderSubjectCard = (subject: Subject) => (
-    <Link
+    <TouchableOpacity
       key={subject.id}
-      href={`/subject/${subject.id}`}
-      asChild
+      style={[styles.subjectCard, { borderLeftColor: subject.color }]}
+      onPress={() => navigateToSubject(subject.id)}
+      activeOpacity={0.7}
     >
-      <Pressable
-        style={[styles.subjectCard, { borderLeftColor: subject.color }]}
-      >
-        <View style={[styles.iconContainer, { backgroundColor: subject.color + '20' }]}>
-          <MaterialCommunityIcons
-            name={ICON_MAP[subject.icon] || 'book'}
-            size={28}
-            color={subject.color}
-          />
-        </View>
-        <View style={styles.cardContent}>
-          <Text style={styles.subjectName}>{subject.name}</Text>
-          <Text style={styles.subjectDescription} numberOfLines={2}>
-            {subject.description}
-          </Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <MaterialCommunityIcons name="file-document-outline" size={14} color="#94A3B8" />
-              <Text style={styles.statText}>{subject.total_papers} Papers</Text>
-            </View>
-            <View style={styles.statItem}>
-              <MaterialCommunityIcons name="help-circle-outline" size={14} color="#94A3B8" />
-              <Text style={styles.statText}>{subject.total_questions} MCQs</Text>
-            </View>
+      <View style={[styles.iconContainer, { backgroundColor: subject.color + '20' }]}>
+        <MaterialCommunityIcons
+          name={ICON_MAP[subject.icon] || 'book'}
+          size={28}
+          color={subject.color}
+        />
+      </View>
+      <View style={styles.cardContent}>
+        <Text style={styles.subjectName}>{subject.name}</Text>
+        <Text style={styles.subjectDescription} numberOfLines={2}>
+          {subject.description}
+        </Text>
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <MaterialCommunityIcons name="file-document-outline" size={14} color="#94A3B8" />
+            <Text style={styles.statText}>{subject.total_papers} Papers</Text>
+          </View>
+          <View style={styles.statItem}>
+            <MaterialCommunityIcons name="help-circle-outline" size={14} color="#94A3B8" />
+            <Text style={styles.statText}>{subject.total_questions} MCQs</Text>
           </View>
         </View>
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#64748B" />
-      </Pressable>
-    </Link>
+      </View>
+      <MaterialCommunityIcons name="chevron-right" size={24} color="#64748B" />
+    </TouchableOpacity>
   );
-
-  if (isLoading && subjects.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading subjects...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   if (error && subjects.length === 0) {
     return (
@@ -303,7 +294,6 @@ const styles = StyleSheet.create({
   },
   headerButtons: {
     flexDirection: 'row',
-    gap: 8,
   },
   headerButton: {
     width: 44,
@@ -312,6 +302,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 8,
   },
   scrollView: {
     flex: 1,
@@ -369,26 +360,16 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 16,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    marginRight: 16,
   },
   statText: {
     fontSize: 12,
     color: '#64748B',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#94A3B8',
+    marginLeft: 4,
   },
   errorContainer: {
     flex: 1,
