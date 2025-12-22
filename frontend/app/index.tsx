@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
   RefreshControl,
   Platform,
+  Pressable,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
