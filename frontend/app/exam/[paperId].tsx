@@ -402,27 +402,27 @@ export default function ExamScreen() {
           ]}>Prev</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <MaterialCommunityIcons name="check" size={20} color="#FFFFFF" />
-          <Text style={styles.submitButtonText}>Submit</Text>
+        <TouchableOpacity style={styles.completeButton} onPress={handleCompleteTest}>
+          <MaterialCommunityIcons name="flag-checkered" size={18} color="#FFFFFF" />
+          <Text style={styles.completeButtonText}>Complete</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
-            styles.navButton,
-            currentQuestionIndex === questions.length - 1 && styles.navButtonDisabled
+            styles.nextButton,
+            currentQuestionIndex === questions.length - 1 && styles.nextButtonDisabled
           ]}
           onPress={() => goToQuestion(Math.min(questions.length - 1, currentQuestionIndex + 1))}
           disabled={currentQuestionIndex === questions.length - 1}
         >
           <Text style={[
-            styles.navButtonText,
-            currentQuestionIndex === questions.length - 1 && styles.navButtonTextDisabled
+            styles.nextButtonText,
+            currentQuestionIndex === questions.length - 1 && styles.nextButtonTextDisabled
           ]}>Next</Text>
           <MaterialCommunityIcons
             name="chevron-right"
             size={24}
-            color={currentQuestionIndex === questions.length - 1 ? '#475569' : '#F8FAFC'}
+            color={currentQuestionIndex === questions.length - 1 ? '#475569' : '#FFFFFF'}
           />
         </TouchableOpacity>
       </View>
