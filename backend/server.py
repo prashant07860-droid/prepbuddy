@@ -656,7 +656,10 @@ async def get_questions(paper_id: str):
     return questions
 
 @api_router.post("/attempts")
-async def create_attempt(attempt_data: AttemptCreate):
+async def create_attempt(
+    attempt_data: AttemptCreate,
+    user_id: str = Depends(get_user_id)
+):
     """Submit an exam attempt"""
     # Get questions for the paper
     questions = await db.questions.find({"paper_id": attempt_data.paper_id}).to_list(200)
@@ -683,6 +686,7 @@ async def create_attempt(attempt_data: AttemptCreate):
     score_percentage = (correct_count / total_questions) * 100 if total_questions > 0 else 0
     
     attempt = Attempt(
+        user_id=user_id,
         paper_id=attempt_data.paper_id,
         subject_id=attempt_data.subject_id,
         answers=attempt_data.answers,
@@ -696,16 +700,31 @@ async def create_attempt(attempt_data: AttemptCreate):
     )
     
     await db.attempts.insert_one(attempt.dict())
+    
+    # Update user stats if not guest
+    if user_id != "guest_user":
+        await db.users.update_one(
+            {"id": user_id},
+            {
+                "$inc": {
+                    "total_attempts": 1,
+                    "total_correct": correct_count,
+                    "total_questions_attempted": total_questions
+                }
+            }
+        )
+    
     return attempt
 
 @api_router.get("/attempts")
 async def get_attempts(
     subject_id: Optional[str] = None,
     paper_id: Optional[str] = None,
-    limit: int = Query(default=50, le=100)
+    limit: int = Query(default=50, le=100),
+    user_id: str = Depends(get_user_id)
 ):
     """Get user's attempt history"""
-    query = {"user_id": "default_user"}
+    query = {"user_id": user_id}
     if subject_id:
         query["subject_id"] = subject_id
     if paper_id:
