@@ -8,11 +8,23 @@ import {
   ActivityIndicator,
   RefreshControl,
   Linking,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../src/AuthContext';
+
+// Get API base URL - use environment variable or fallback to relative path
+const getApiBaseUrl = () => {
+  if (Platform.OS === 'web') {
+    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (backendUrl) {
+      return backendUrl;
+    }
+  }
+  return '';
+};
 
 interface Subject {
   id: string;
