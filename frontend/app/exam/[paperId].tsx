@@ -245,6 +245,14 @@ export default function ExamScreen() {
 
   const setAnswer = (questionId: string, optionIndex: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
+    
+    // Auto-advance to next question after a short delay
+    setTimeout(() => {
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }
+    }, 300);
   };
 
   const toggleBookmark = (questionId: string) => {
