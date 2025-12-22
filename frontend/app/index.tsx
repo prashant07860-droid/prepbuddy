@@ -221,11 +221,11 @@ export default function HomeScreen() {
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <MaterialCommunityIcons name="file-document-outline" size={14} color="#94A3B8" />
-            <Text style={styles.statText}>{subject.total_papers} Papers</Text>
+            <Text style={styles.statText}>25 Samples + 1 Master</Text>
           </View>
           <View style={styles.statItem}>
             <MaterialCommunityIcons name="help-circle-outline" size={14} color="#94A3B8" />
-            <Text style={styles.statText}>{subject.total_questions} MCQs</Text>
+            <Text style={styles.statText}>100 MCQs each</Text>
           </View>
         </View>
       </View>
