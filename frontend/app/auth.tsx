@@ -328,6 +328,14 @@ const styles = StyleSheet.create({
     color: '#F8FAFC',
     fontSize: 16,
   },
+  forgotButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 8,
+  },
+  forgotText: {
+    fontSize: 14,
+    color: '#3B82F6',
+  },
   submitButton: {
     flexDirection: 'row',
     alignItems: 'center',
