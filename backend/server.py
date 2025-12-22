@@ -282,42 +282,53 @@ QUESTION_TEMPLATES = {
 
 # ============ HELPER FUNCTIONS ============
 
+# Import real questions database
+from real_questions import REAL_QUESTIONS_DATABASE
+
 def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, is_master: bool = False) -> List[dict]:
-    """Generate realistic OPSC-style questions for a subject"""
+    """Generate OPSC questions using real PYQ database for the subject"""
     questions = []
-    template_data = QUESTION_TEMPLATES.get(subject_name, QUESTION_TEMPLATES["Polity"])
-    topics = template_data["topics"]
-    templates = template_data["questions"]
     
+    # Get real questions for this subject
+    real_questions = REAL_QUESTIONS_DATABASE.get(subject_name, [])
+    
+    if not real_questions:
+        # Fallback to template if no real questions available
+        real_questions = REAL_QUESTIONS_DATABASE.get("Polity", [])
+    
+    # Create questions for this paper
     for i in range(count):
-        topic = random.choice(topics)
-        template = random.choice(templates)
+        # Cycle through real questions if we need more than available
+        real_q = real_questions[i % len(real_questions)]
         
-        question_text = template[0].format(topic=topic)
-        options = [opt.replace("{topic}", topic) for opt in template[1]]
-        correct_option = template[2]
-        
-        # Shuffle options for variety
-        if random.random() > 0.5:
-            random.shuffle(options)
-            # Update correct option index after shuffle
-            correct_option = random.randint(0, 3)
-        
-        difficulty = random.choice(["easy", "medium", "medium", "hard"]) if not is_master else random.choice(["medium", "hard", "hard"])
+        # For master papers, prefer harder questions
+        if is_master and real_q.get("difficulty") == "easy" and i < len(real_questions):
+            # Try to find a harder question
+            for q in real_questions:
+                if q.get("difficulty") in ["medium", "hard"]:
+                    real_q = q
+                    break
         
         question = {
             "id": str(uuid.uuid4()),
             "paper_id": paper_id,
             "subject_id": subject_id,
             "question_number": i + 1,
-            "question_text": question_text,
-            "options": options,
-            "correct_option": correct_option,
-            "explanation": f"This question tests knowledge of {topic} in {subject_name}. The correct answer demonstrates understanding of key concepts.",
-            "difficulty": difficulty,
-            "topic": topic
+            "question_text": real_q["question_text"],
+            "options": real_q["options"].copy(),
+            "correct_option": real_q["correct_option"],
+            "explanation": real_q.get("explanation", f"This question tests knowledge of {real_q.get('topic', subject_name)}."),
+            "difficulty": real_q.get("difficulty", "medium"),
+            "topic": real_q.get("topic", subject_name)
         }
         questions.append(question)
+    
+    # Shuffle questions for variety in different papers
+    random.shuffle(questions)
+    
+    # Re-number after shuffle
+    for i, q in enumerate(questions):
+        q["question_number"] = i + 1
     
     return questions
 
