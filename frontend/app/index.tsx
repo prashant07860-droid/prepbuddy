@@ -430,4 +430,20 @@ const styles = StyleSheet.create({
   bottomPadding: {
     height: 24,
   },
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#1E293B',
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#64748B',
+  },
+  footerLink: {
+    color: '#3B82F6',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
 });
