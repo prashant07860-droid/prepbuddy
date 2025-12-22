@@ -437,6 +437,178 @@ def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id:
 async def root():
     return {"message": "OPSC Exam Prep API", "version": "1.0"}
 
+# ============ AUTH ENDPOINTS ============
+
+@api_router.post("/auth/register")
+async def register(user_data: UserRegister):
+    """Register a new user"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": user_data.email.lower()})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    user = User(
+        name=user_data.name,
+        email=user_data.email.lower(),
+        password=hash_password(user_data.password)
+    )
+    
+    await db.users.insert_one(user.dict())
+    
+    # Create token
+    token = create_token(user.id, user.email)
+    
+    return {
+        "message": "Registration successful",
+        "token": token,
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email
+        }
+    }
+
+@api_router.post("/auth/login")
+async def login(credentials: UserLogin):
+    """Login user"""
+    user = await db.users.find_one({"email": credentials.email.lower()})
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    if not verify_password(credentials.password, user["password"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Create token
+    token = create_token(user["id"], user["email"])
+    
+    return {
+        "message": "Login successful",
+        "token": token,
+        "user": {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"]
+        }
+    }
+
+@api_router.get("/auth/me")
+async def get_current_user_profile(current_user: Optional[Dict] = Depends(get_current_user)):
+    """Get current user profile"""
+    if not current_user:
+        return {"is_guest": True, "message": "Guest mode - login to save progress"}
+    
+    # Get user's attempts for statistics
+    attempts = await db.attempts.find({"user_id": current_user["id"]}).to_list(1000)
+    
+    total_attempts = len(attempts)
+    total_correct = sum(a.get("correct_count", 0) for a in attempts)
+    total_questions = sum(a.get("total_questions", 0) for a in attempts)
+    overall_accuracy = (total_correct / total_questions * 100) if total_questions > 0 else 0
+    
+    # Get subject-wise progress
+    subject_stats = {}
+    for attempt in attempts:
+        sid = attempt["subject_id"]
+        if sid not in subject_stats:
+            subject_stats[sid] = {"attempts": 0, "correct": 0, "total": 0, "scores": []}
+        subject_stats[sid]["attempts"] += 1
+        subject_stats[sid]["correct"] += attempt.get("correct_count", 0)
+        subject_stats[sid]["total"] += attempt.get("total_questions", 0)
+        subject_stats[sid]["scores"].append(attempt.get("score_percentage", 0))
+    
+    # Get subject names
+    subjects = await db.subjects.find({}).to_list(100)
+    subject_map = {s["id"]: s["name"] for s in subjects}
+    
+    subject_progress = []
+    for sid, stats in subject_stats.items():
+        accuracy = (stats["correct"] / stats["total"] * 100) if stats["total"] > 0 else 0
+        avg_score = sum(stats["scores"]) / len(stats["scores"]) if stats["scores"] else 0
+        subject_progress.append({
+            "subject_id": sid,
+            "subject_name": subject_map.get(sid, "Unknown"),
+            "attempts": stats["attempts"],
+            "accuracy": round(accuracy, 1),
+            "average_score": round(avg_score, 1),
+            "total_questions_attempted": stats["total"]
+        })
+    
+    return {
+        "is_guest": False,
+        "id": current_user["id"],
+        "name": current_user["name"],
+        "email": current_user["email"],
+        "created_at": current_user.get("created_at"),
+        "total_attempts": total_attempts,
+        "total_correct": total_correct,
+        "total_questions_attempted": total_questions,
+        "overall_accuracy": round(overall_accuracy, 1),
+        "subject_progress": sorted(subject_progress, key=lambda x: x["attempts"], reverse=True)
+    }
+
+@api_router.put("/auth/profile")
+async def update_profile(
+    name: str = None,
+    current_user: Optional[Dict] = Depends(get_current_user)
+):
+    """Update user profile"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Login required")
+    
+    update_data = {}
+    if name:
+        update_data["name"] = name
+    
+    if update_data:
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": update_data}
+        )
+    
+    return {"message": "Profile updated successfully"}
+
+@api_router.post("/auth/guest/convert")
+async def convert_guest_to_user(
+    user_data: UserRegister,
+    guest_attempts: List[str] = []
+):
+    """Convert guest progress to a new user account"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": user_data.email.lower()})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    user = User(
+        name=user_data.name,
+        email=user_data.email.lower(),
+        password=hash_password(user_data.password)
+    )
+    
+    await db.users.insert_one(user.dict())
+    
+    # Transfer guest attempts to new user
+    if guest_attempts:
+        await db.attempts.update_many(
+            {"id": {"$in": guest_attempts}, "user_id": "guest_user"},
+            {"$set": {"user_id": user.id}}
+        )
+    
+    # Create token
+    token = create_token(user.id, user.email)
+    
+    return {
+        "message": "Account created and progress saved",
+        "token": token,
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email
+        }
+    }
+
 @api_router.get("/subjects")
 async def get_subjects():
     """Get all subjects"""
