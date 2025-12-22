@@ -149,8 +149,8 @@ class Subject(BaseModel):
     description: str
     icon: str
     color: str
-    total_papers: int = 20
-    total_questions: int = 2000
+    total_papers: int = 26  # 20 regular + 5 extreme + 1 master
+    total_questions: int = 2600  # 26 papers x 100 questions
 
 class Paper(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
