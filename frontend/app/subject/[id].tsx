@@ -133,52 +133,53 @@ export default function SubjectScreen() {
     const hasAttempt = bestScore !== null;
 
     return (
-      <TouchableOpacity
+      <Link
         key={paper.id}
-        style={styles.paperCard}
-        onPress={() => router.push(`/exam/${paper.id}`)}
-        activeOpacity={0.7}
+        href={`/exam/${paper.id}`}
+        asChild
       >
-        <View style={styles.paperLeft}>
-          <View style={[styles.paperIcon, paper.is_master && styles.masterIcon]}>
-            <MaterialCommunityIcons
-              name={paper.is_master ? 'star' : 'file-document'}
-              size={20}
-              color={paper.is_master ? '#F59E0B' : '#3B82F6'}
-            />
-          </View>
-          <View style={styles.paperInfo}>
-            <Text style={styles.paperTitle}>{paper.title}</Text>
-            <View style={styles.paperMeta}>
-              <Text style={styles.paperMetaText}>
-                {paper.total_questions} Questions
-              </Text>
-              <Text style={styles.paperMetaDot}>•</Text>
-              <Text style={styles.paperMetaText}>
-                {paper.duration_minutes} min
-              </Text>
+        <Pressable style={styles.paperCard}>
+          <View style={styles.paperLeft}>
+            <View style={[styles.paperIcon, paper.is_master && styles.masterIcon]}>
+              <MaterialCommunityIcons
+                name={paper.is_master ? 'star' : 'file-document'}
+                size={20}
+                color={paper.is_master ? '#F59E0B' : '#3B82F6'}
+              />
+            </View>
+            <View style={styles.paperInfo}>
+              <Text style={styles.paperTitle}>{paper.title}</Text>
+              <View style={styles.paperMeta}>
+                <Text style={styles.paperMetaText}>
+                  {paper.total_questions} Questions
+                </Text>
+                <Text style={styles.paperMetaDot}>•</Text>
+                <Text style={styles.paperMetaText}>
+                  {paper.duration_minutes} min
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        <View style={styles.paperRight}>
-          {hasAttempt ? (
-            <View style={styles.scoreContainer}>
-              <Text style={[
-                styles.scoreText,
-                bestScore! >= 70 ? styles.scoreGood : bestScore! >= 40 ? styles.scoreMedium : styles.scoreLow
-              ]}>
-                {bestScore}%
-              </Text>
-              <Text style={styles.scoreBest}>Best</Text>
-            </View>
-          ) : (
-            <View style={styles.newBadge}>
-              <Text style={styles.newBadgeText}>NEW</Text>
-            </View>
-          )}
-          <MaterialCommunityIcons name="chevron-right" size={20} color="#64748B" />
-        </View>
-      </TouchableOpacity>
+          <View style={styles.paperRight}>
+            {hasAttempt ? (
+              <View style={styles.scoreContainer}>
+                <Text style={[
+                  styles.scoreText,
+                  bestScore! >= 70 ? styles.scoreGood : bestScore! >= 40 ? styles.scoreMedium : styles.scoreLow
+                ]}>
+                  {bestScore}%
+                </Text>
+                <Text style={styles.scoreBest}>Best</Text>
+              </View>
+            ) : (
+              <View style={styles.newBadge}>
+                <Text style={styles.newBadgeText}>NEW</Text>
+              </View>
+            )}
+            <MaterialCommunityIcons name="chevron-right" size={20} color="#64748B" />
+          </View>
+        </Pressable>
+      </Link>
     );
   };
 
