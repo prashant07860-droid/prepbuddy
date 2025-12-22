@@ -110,6 +110,14 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class ForgotPassword(BaseModel):
+    email: str
+
+class ResetPassword(BaseModel):
+    email: str
+    reset_code: str
+    new_password: str
+
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
@@ -119,6 +127,8 @@ class User(BaseModel):
     total_attempts: int = 0
     total_correct: int = 0
     total_questions_attempted: int = 0
+    reset_code: Optional[str] = None
+    reset_code_expires: Optional[datetime] = None
 
 class UserProfile(BaseModel):
     id: str
