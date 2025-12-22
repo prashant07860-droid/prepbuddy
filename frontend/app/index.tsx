@@ -278,6 +278,19 @@ export default function HomeScreen() {
 
         {subjects.map(renderSubjectCard)}
 
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Made with ❤️ by{' '}
+            <Text
+              style={styles.footerLink}
+              onPress={() => Linking.openURL('https://www.linkedin.com/in/prashantranaofficial/')}
+            >
+              Prashant (Sean) Rana
+            </Text>
+          </Text>
+        </View>
+
         <View style={styles.bottomPadding} />
       </ScrollView>
     </SafeAreaView>
