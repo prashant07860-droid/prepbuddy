@@ -141,9 +141,17 @@ const INITIAL_SUBJECTS: Subject[] = [
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { user, isGuest, isLoading: authLoading } = useAuth();
   const [subjects, setSubjects] = useState<Subject[]>(INITIAL_SUBJECTS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Redirect to auth if not logged in and not guest
+  useEffect(() => {
+    if (!authLoading && !user && !isGuest) {
+      router.replace('/auth');
+    }
+  }, [authLoading, user, isGuest]);
 
   const fetchSubjects = useCallback(async () => {
     try {
