@@ -89,45 +89,46 @@ export default function AuthScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo and Title */}
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <MaterialCommunityIcons name="school" size={48} color="#3B82F6" />
+          <View style={styles.contentWrapper}>
+            {/* Logo and Title */}
+            <View style={styles.header}>
+              <View style={styles.logoContainer}>
+                <MaterialCommunityIcons name="school" size={48} color="#3B82F6" />
+              </View>
+              <Text style={styles.appTitle}>OPSC Exam Prep</Text>
+              <Text style={styles.appSubtitle}>Your path to success</Text>
             </View>
-            <Text style={styles.appTitle}>OPSC Exam Prep</Text>
-            <Text style={styles.appSubtitle}>Your path to success</Text>
-          </View>
 
-          {/* Auth Form */}
-          <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>
-              {isLogin ? 'Welcome Back!' : 'Create Account'}
-            </Text>
-            <Text style={styles.formSubtitle}>
-              {isLogin
-                ? 'Login to track your progress'
-                : 'Sign up to save your progress'}
-            </Text>
+            {/* Auth Form */}
+            <View style={styles.formContainer}>
+              <Text style={styles.formTitle}>
+                {isLogin ? 'Welcome Back!' : 'Create Account'}
+              </Text>
+              <Text style={styles.formSubtitle}>
+                {isLogin
+                  ? 'Login to track your progress'
+                  : 'Sign up to save your progress'}
+              </Text>
 
-            {error ? (
-              <View style={styles.errorContainer}>
-                <MaterialCommunityIcons name="alert-circle" size={18} color="#EF4444" />
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : null}
+              {error ? (
+                <View style={styles.errorContainer}>
+                  <MaterialCommunityIcons name="alert-circle" size={18} color="#EF4444" />
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              ) : null}
 
-            {!isLogin && (
-              <View style={styles.inputContainer}>
-                <MaterialCommunityIcons name="account" size={20} color="#64748B" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Full Name"
-                  placeholderTextColor="#64748B"
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
-                />
-              </View>
+              {!isLogin && (
+                <View style={styles.inputContainer}>
+                  <MaterialCommunityIcons name="account" size={20} color="#64748B" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Full Name"
+                    placeholderTextColor="#64748B"
+                    value={name}
+                    onChangeText={setName}
+                    autoCapitalize="words"
+                  />
+                </View>
             )}
 
             <View style={styles.inputContainer}>
