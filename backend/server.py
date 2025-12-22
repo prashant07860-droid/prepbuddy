@@ -393,6 +393,8 @@ QUESTION_TEMPLATES = {
 
 # Import real questions database
 from real_questions import REAL_QUESTIONS_DATABASE
+# Import extreme difficulty questions
+from extreme_questions import EXTREME_QUESTIONS_DATABASE
 
 def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, is_master: bool = False) -> List[dict]:
     """Generate OPSC questions using real PYQ database for the subject"""
