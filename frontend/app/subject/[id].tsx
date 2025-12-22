@@ -21,68 +21,28 @@ interface Paper {
   duration_minutes: number;
 }
 
+interface Subject {
+  id: string;
+  name: string;
+  color: string;
+  description: string;
+}
+
 interface Attempt {
   id: string;
   paper_id: string;
   score_percentage: number;
 }
 
-// Subject data mapping
-const SUBJECTS_MAP: Record<string, { name: string; color: string }> = {
-  'bf517fa7-5aac-4639-8363-2aeaa198b915': { name: 'Polity', color: '#3B82F6' },
-  'a41db799-f11b-44cb-b987-c8b744353ee9': { name: 'Geography', color: '#10B981' },
-  'bb219476-4e4c-4337-ac93-0022a1b0116f': { name: 'History of Modern India', color: '#F59E0B' },
-  '0e3373c7-aee7-433c-9922-ff1da0806a3f': { name: 'Ethics', color: '#8B5CF6' },
-  'c32206e4-4f15-4c7e-a6c7-227361d90a76': { name: 'Science and Technology', color: '#EC4899' },
-  '138bb0a1-4b12-4eac-838b-b02d7ba2f192': { name: 'Economics', color: '#06B6D4' },
-  'da991167-40b5-43d6-b8fd-4b913d3da04a': { name: 'Environment and Ecology', color: '#22C55E' },
-  '5cf4e1e2-2d0a-41df-b06b-1a7ed058278d': { name: 'Ancient & Medieval History', color: '#D97706' },
-  'ff1a2f17-6ca0-4c83-b58d-22b3280b4f04': { name: 'Indian Society', color: '#EF4444' },
-  '6d0a547e-ed97-4741-ba10-8c9d2a3aed2f': { name: 'Odisha Studies', color: '#7C3AED' },
-  '8b5a7f40-4cec-45fb-a2c6-80bbb339a5b7': { name: 'Current Affairs', color: '#0EA5E9' },
-};
-
-// Generate initial papers data
-const generatePapers = (subjectId: string): Paper[] => {
-  const subjectName = SUBJECTS_MAP[subjectId]?.name || 'Subject';
-  const papers: Paper[] = [];
-  
-  // Generate 20 practice papers
-  for (let i = 1; i <= 20; i++) {
-    papers.push({
-      id: `${subjectId}-practice-${i}`,
-      subject_id: subjectId,
-      paper_number: i,
-      is_master: false,
-      title: `${subjectName} Practice Paper ${i}`,
-      total_questions: 100,
-      duration_minutes: 90,
-    });
-  }
-  
-  // Add master paper
-  papers.push({
-    id: `${subjectId}-master`,
-    subject_id: subjectId,
-    paper_number: 0,
-    is_master: true,
-    title: `${subjectName} Master Prediction Paper`,
-    total_questions: 100,
-    duration_minutes: 90,
-  });
-  
-  return papers;
-};
-
 export default function SubjectScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'practice' | 'master'>('practice');
   
-  const subjectInfo = id ? SUBJECTS_MAP[id] : null;
-  const [papers, setPapers] = useState<Paper[]>(() => id ? generatePapers(id) : []);
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [papers, setPapers] = useState<Paper[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -90,13 +50,18 @@ export default function SubjectScreen() {
     try {
       setIsLoading(true);
       
+      // Fetch subject info from API
+      const subjectRes = await fetch(`/api/subjects/${id}`);
+      if (subjectRes.ok) {
+        const subjectData = await subjectRes.json();
+        setSubject(subjectData);
+      }
+      
       // Fetch papers from API
       const papersRes = await fetch(`/api/subjects/${id}/papers`);
       if (papersRes.ok) {
         const papersData = await papersRes.json();
-        if (papersData.length > 0) {
-          setPapers(papersData);
-        }
+        setPapers(papersData);
       }
 
       // Fetch attempts
@@ -118,7 +83,9 @@ export default function SubjectScreen() {
     }
   }, [id, fetchData]);
 
-  const practicePapers = papers.filter((p) => !p.is_master);
+  // Separate papers into categories
+  const regularPapers = papers.filter((p) => !p.is_master && !p.title.includes('(Extreme)'));
+  const extremePapers = papers.filter((p) => p.title.includes('(Extreme)'));
   const masterPaper = papers.find((p) => p.is_master);
 
   const getBestScore = (paperId: string) => {
@@ -131,23 +98,30 @@ export default function SubjectScreen() {
     router.push(`/exam/${paperId}`);
   };
 
+  const isExtremePaper = (paper: Paper) => paper.title.includes('(Extreme)');
+
   const renderPaperCard = (paper: Paper) => {
     const bestScore = getBestScore(paper.id);
     const hasAttempt = bestScore !== null;
+    const isExtreme = isExtremePaper(paper);
 
     return (
       <TouchableOpacity
         key={paper.id}
-        style={styles.paperCard}
+        style={[styles.paperCard, isExtreme && styles.extremePaperCard]}
         onPress={() => navigateToPaper(paper.id)}
         activeOpacity={0.7}
       >
         <View style={styles.paperLeft}>
-          <View style={[styles.paperIcon, paper.is_master && styles.masterIcon]}>
+          <View style={[
+            styles.paperIcon, 
+            paper.is_master && styles.masterIcon,
+            isExtreme && styles.extremeIcon
+          ]}>
             <MaterialCommunityIcons
-              name={paper.is_master ? 'star' : 'file-document'}
+              name={paper.is_master ? 'star' : isExtreme ? 'fire' : 'file-document'}
               size={20}
-              color={paper.is_master ? '#F59E0B' : '#3B82F6'}
+              color={paper.is_master ? '#F59E0B' : isExtreme ? '#EF4444' : '#3B82F6'}
             />
           </View>
           <View style={styles.paperInfo}>
@@ -175,8 +149,10 @@ export default function SubjectScreen() {
               <Text style={styles.scoreBest}>Best</Text>
             </View>
           ) : (
-            <View style={styles.newBadge}>
-              <Text style={styles.newBadgeText}>NEW</Text>
+            <View style={[styles.newBadge, isExtreme && styles.extremeBadge]}>
+              <Text style={[styles.newBadgeText, isExtreme && styles.extremeBadgeText]}>
+                {isExtreme ? 'TOUGH' : 'NEW'}
+              </Text>
             </View>
           )}
           <MaterialCommunityIcons name="chevron-right" size={20} color="#64748B" />
@@ -184,6 +160,17 @@ export default function SubjectScreen() {
       </TouchableOpacity>
     );
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text style={styles.loadingText}>Loading papers...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -196,10 +183,10 @@ export default function SubjectScreen() {
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {subjectInfo?.name || 'Subject'}
+            {subject?.name || 'Subject'}
           </Text>
           <Text style={styles.headerSubtitle}>
-            {practicePapers.length} Practice + {masterPaper ? '1 Master' : '0 Master'}
+            {regularPapers.length} Practice + {extremePapers.length} Extreme + {masterPaper ? '1 Master' : '0 Master'}
           </Text>
         </View>
       </View>
@@ -243,7 +230,20 @@ export default function SubjectScreen() {
             <Text style={styles.sectionInfo}>
               Practice with previous year questions pattern
             </Text>
-            {practicePapers.map(renderPaperCard)}
+            {regularPapers.map(renderPaperCard)}
+            
+            {extremePapers.length > 0 && (
+              <>
+                <View style={styles.extremeSection}>
+                  <MaterialCommunityIcons name="fire" size={20} color="#EF4444" />
+                  <Text style={styles.extremeSectionTitle}>Extreme Difficulty</Text>
+                </View>
+                <Text style={styles.extremeInfo}>
+                  🔥 Challenge yourself with the toughest questions. These require deep analytical thinking and multi-concept understanding.
+                </Text>
+                {extremePapers.map(renderPaperCard)}
+              </>
+            )}
           </>
         ) : (
           <>
@@ -265,6 +265,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#94A3B8',
+    marginTop: 12,
   },
   header: {
     flexDirection: 'row',
@@ -335,6 +345,24 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginBottom: 16,
   },
+  extremeSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  extremeSectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#EF4444',
+    marginLeft: 8,
+  },
+  extremeInfo: {
+    fontSize: 13,
+    color: '#94A3B8',
+    marginBottom: 16,
+    lineHeight: 18,
+  },
   masterInfo: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -359,6 +387,11 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 10,
   },
+  extremePaperCard: {
+    borderWidth: 1,
+    borderColor: '#7F1D1D',
+    backgroundColor: '#1C1917',
+  },
   paperLeft: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -375,6 +408,9 @@ const styles = StyleSheet.create({
   },
   masterIcon: {
     backgroundColor: '#422006',
+  },
+  extremeIcon: {
+    backgroundColor: '#450A0A',
   },
   paperInfo: {
     flex: 1,
@@ -434,5 +470,11 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
     color: '#3B82F6',
+  },
+  extremeBadge: {
+    backgroundColor: '#450A0A',
+  },
+  extremeBadgeText: {
+    color: '#EF4444',
   },
 });
