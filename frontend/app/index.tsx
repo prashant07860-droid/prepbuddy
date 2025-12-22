@@ -170,8 +170,9 @@ export default function HomeScreen() {
     try {
       setIsLoading(true);
       setError(null);
+      const apiBase = getApiBaseUrl();
       
-      const response = await fetch('/api/subjects');
+      const response = await fetch(`${apiBase}/api/subjects`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch subjects: ${response.status}`);
