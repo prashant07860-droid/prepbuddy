@@ -443,6 +443,46 @@ def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id:
     
     return questions
 
+
+def generate_extreme_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100) -> List[dict]:
+    """Generate extreme difficulty questions using the extreme questions database"""
+    questions = []
+    
+    # Get extreme questions for this subject
+    extreme_questions = EXTREME_QUESTIONS_DATABASE.get(subject_name, [])
+    
+    if not extreme_questions:
+        # Fallback to Polity extreme questions if subject not found
+        extreme_questions = EXTREME_QUESTIONS_DATABASE.get("Polity", [])
+    
+    # Create questions for this paper
+    for i in range(count):
+        # Cycle through extreme questions if we need more than available
+        extreme_q = extreme_questions[i % len(extreme_questions)]
+        
+        question = {
+            "id": str(uuid.uuid4()),
+            "paper_id": paper_id,
+            "subject_id": subject_id,
+            "question_number": i + 1,
+            "question_text": extreme_q["question_text"],
+            "options": extreme_q["options"].copy(),
+            "correct_option": extreme_q["correct_option"],
+            "explanation": extreme_q.get("explanation", f"This is an extreme difficulty question testing deep knowledge of {extreme_q.get('topic', subject_name)}."),
+            "difficulty": "extreme",  # Always mark as extreme
+            "topic": extreme_q.get("topic", subject_name)
+        }
+        questions.append(question)
+    
+    # Shuffle questions for variety in different papers
+    random.shuffle(questions)
+    
+    # Re-number after shuffle
+    for i, q in enumerate(questions):
+        q["question_number"] = i + 1
+    
+    return questions
+
 # ============ API ENDPOINTS ============
 
 @api_router.get("/")
