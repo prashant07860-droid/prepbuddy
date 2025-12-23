@@ -48,7 +48,39 @@ const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
   'account-group': 'account-group',
   'map-marker': 'map-marker',
   newspaper: 'newspaper',
+  sprout: 'sprout',
 };
+
+// Logo Component
+const PrepBuddyLogo = ({ size = 40 }: { size?: number }) => (
+  <View style={[logoStyles.container, { width: size, height: size, borderRadius: size / 4 }]}>
+    <View style={logoStyles.innerCircle}>
+      <MaterialCommunityIcons name="school" size={size * 0.5} color="#FFFFFF" />
+    </View>
+    <View style={[logoStyles.accent, { width: size * 0.25, height: size * 0.25 }]} />
+  </View>
+);
+
+const logoStyles = StyleSheet.create({
+  container: {
+    backgroundColor: '#3B82F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  innerCircle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  accent: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: '#22C55E',
+    borderRadius: 100,
+  },
+});
 
 const INITIAL_SUBJECTS: Subject[] = [
   {
