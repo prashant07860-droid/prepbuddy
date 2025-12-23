@@ -515,21 +515,25 @@ export default function ExamScreen() {
 
       {/* Navigation Footer */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.navButton, currentQuestionIndex === 0 && styles.navButtonDisabled]}
-          onPress={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
-          disabled={currentQuestionIndex === 0}
-        >
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={24}
-            color={currentQuestionIndex === 0 ? '#475569' : '#F8FAFC'}
-          />
-          <Text style={[
-            styles.navButtonText,
-            currentQuestionIndex === 0 && styles.navButtonTextDisabled
-          ]}>Prev</Text>
-        </TouchableOpacity>
+        {allowResubmission ? (
+          <TouchableOpacity
+            style={[styles.navButton, currentQuestionIndex === 0 && styles.navButtonDisabled]}
+            onPress={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
+            disabled={currentQuestionIndex === 0}
+          >
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={24}
+              color={currentQuestionIndex === 0 ? '#475569' : '#F8FAFC'}
+            />
+            <Text style={[
+              styles.navButtonText,
+              currentQuestionIndex === 0 && styles.navButtonTextDisabled
+            ]}>Prev</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.navButtonPlaceholder} />
+        )}
 
         <TouchableOpacity style={styles.completeButton} onPress={handleCompleteTest}>
           <MaterialCommunityIcons name="flag-checkered" size={18} color="#FFFFFF" />
