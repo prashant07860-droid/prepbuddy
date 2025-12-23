@@ -176,13 +176,18 @@ export default function ExamScreen() {
       }
     });
     
-    const scorePercentage = Math.round((correct / questions.length) * 100);
+    // Calculate score with negative marking: +1 for correct, -0.25 for wrong
+    const rawScore = correct - (wrong * 0.25);
+    const maxScore = questions.length; // Maximum possible score
+    const scorePercentage = Math.round((Math.max(0, rawScore) / maxScore) * 100);
 
     setFinalResult({
       correct,
       wrong,
       skipped,
       scorePercentage,
+      rawScore: rawScore.toFixed(2),
+      maxScore,
       timeTaken: formatTime(timeTaken),
     });
     
