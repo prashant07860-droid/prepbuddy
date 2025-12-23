@@ -736,6 +736,139 @@ export default function ExamScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Answer Key Modal */}
+      <Modal
+        visible={showAnswerKey}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowAnswerKey(false)}
+      >
+        <SafeAreaView style={styles.answerKeyContainer}>
+          <View style={styles.answerKeyHeader}>
+            <TouchableOpacity
+              style={styles.answerKeyBackButton}
+              onPress={() => setShowAnswerKey(false)}
+            >
+              <MaterialCommunityIcons name="arrow-left" size={24} color="#F8FAFC" />
+            </TouchableOpacity>
+            <Text style={styles.answerKeyTitle}>Answer Key</Text>
+            <View style={styles.answerKeyScoreBadge}>
+              <Text style={styles.answerKeyScoreText}>{finalResult?.scorePercentage}%</Text>
+            </View>
+          </View>
+
+          <ScrollView 
+            style={styles.answerKeyScroll}
+            contentContainerStyle={styles.answerKeyContent}
+          >
+            {questions.map((question, qIndex) => {
+              const userAnswer = answers[question.id];
+              const isCorrect = userAnswer === question.correct_option;
+              const isSkipped = userAnswer === undefined;
+
+              return (
+                <View key={question.id} style={styles.answerKeyItem}>
+                  <View style={styles.answerKeyQuestionHeader}>
+                    <View style={[
+                      styles.answerKeyStatus,
+                      isCorrect && styles.answerKeyStatusCorrect,
+                      !isCorrect && !isSkipped && styles.answerKeyStatusWrong,
+                      isSkipped && styles.answerKeyStatusSkipped,
+                    ]}>
+                      <MaterialCommunityIcons 
+                        name={isCorrect ? 'check' : isSkipped ? 'minus' : 'close'} 
+                        size={14} 
+                        color="#FFFFFF" 
+                      />
+                    </View>
+                    <Text style={styles.answerKeyQuestionNumber}>Q{qIndex + 1}</Text>
+                    {question.difficulty && (
+                      <View style={[
+                        styles.answerKeyDifficulty,
+                        question.difficulty === 'hard' && styles.difficultyHard,
+                        question.difficulty === 'easy' && styles.difficultyEasy,
+                      ]}>
+                        <Text style={styles.answerKeyDifficultyText}>
+                          {question.difficulty.toUpperCase()}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <Text style={styles.answerKeyQuestionText}>
+                    {question.question_text}
+                  </Text>
+
+                  <View style={styles.answerKeyOptions}>
+                    {question.options.map((option, optIndex) => {
+                      const isCorrectOption = optIndex === question.correct_option;
+                      const isUserAnswer = optIndex === userAnswer;
+                      const showWrong = isUserAnswer && !isCorrectOption;
+
+                      return (
+                        <View 
+                          key={optIndex} 
+                          style={[
+                            styles.answerKeyOption,
+                            isCorrectOption && styles.answerKeyOptionCorrect,
+                            showWrong && styles.answerKeyOptionWrong,
+                          ]}
+                        >
+                          <View style={[
+                            styles.answerKeyOptionIndex,
+                            isCorrectOption && styles.answerKeyOptionIndexCorrect,
+                            showWrong && styles.answerKeyOptionIndexWrong,
+                          ]}>
+                            <Text style={[
+                              styles.answerKeyOptionIndexText,
+                              (isCorrectOption || showWrong) && styles.answerKeyOptionIndexTextActive,
+                            ]}>
+                              {String.fromCharCode(65 + optIndex)}
+                            </Text>
+                          </View>
+                          <Text style={[
+                            styles.answerKeyOptionText,
+                            isCorrectOption && styles.answerKeyOptionTextCorrect,
+                            showWrong && styles.answerKeyOptionTextWrong,
+                          ]}>
+                            {option}
+                          </Text>
+                          {isCorrectOption && (
+                            <MaterialCommunityIcons name="check-circle" size={18} color="#22C55E" />
+                          )}
+                          {showWrong && (
+                            <MaterialCommunityIcons name="close-circle" size={18} color="#EF4444" />
+                          )}
+                        </View>
+                      );
+                    })}
+                  </View>
+
+                  {question.explanation && (
+                    <View style={styles.answerKeyExplanation}>
+                      <MaterialCommunityIcons name="lightbulb-outline" size={16} color="#F59E0B" />
+                      <Text style={styles.answerKeyExplanationText}>
+                        {question.explanation}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </ScrollView>
+
+          <View style={styles.answerKeyFooter}>
+            <TouchableOpacity
+              style={styles.answerKeyHomeButton}
+              onPress={() => router.replace('/')}
+            >
+              <MaterialCommunityIcons name="home" size={20} color="#FFFFFF" />
+              <Text style={styles.answerKeyHomeText}>Go to Home</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
