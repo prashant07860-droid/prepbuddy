@@ -1134,9 +1134,9 @@ async def reseed_database():
             await db.papers.insert_one(master_paper.dict())
             total_papers += 1
             
-            # Generate master questions (higher difficulty)
+            # Generate master questions (higher difficulty) with unique seed
             master_questions = generate_questions_for_subject(
-                subject.name, master_paper.id, subject.id, 100, True
+                subject.name, master_paper.id, subject.id, 100, True, paper_seed=subject_idx * 100 + 99
             )
             if master_questions:
                 await db.questions.insert_many(master_questions)
