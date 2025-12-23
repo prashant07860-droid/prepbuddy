@@ -1077,7 +1077,7 @@ async def reseed_database():
         total_papers = 0
         total_questions = 0
         
-        for subject in subjects_created:
+        for subject_idx, subject in enumerate(subjects_created):
             # Create 20 practice papers
             for paper_num in range(1, 21):
                 paper = Paper(
@@ -1091,9 +1091,9 @@ async def reseed_database():
                 await db.papers.insert_one(paper.dict())
                 total_papers += 1
                 
-                # Generate questions for this paper using real PYQs
+                # Generate questions for this paper using high-quality database
                 questions = generate_questions_for_subject(
-                    subject.name, paper.id, subject.id, 100, False
+                    subject.name, paper.id, subject.id, 100, False, paper_seed=subject_idx * 100 + paper_num
                 )
                 if questions:
                     await db.questions.insert_many(questions)
@@ -1112,9 +1112,9 @@ async def reseed_database():
                 await db.papers.insert_one(extreme_paper.dict())
                 total_papers += 1
                 
-                # Generate extreme difficulty questions
+                # Generate extreme difficulty questions with unique seed
                 extreme_questions = generate_extreme_questions_for_subject(
-                    subject.name, extreme_paper.id, subject.id, 100
+                    subject.name, extreme_paper.id, subject.id, 100, paper_seed=subject_idx * 100 + 20 + extreme_num
                 )
                 if extreme_questions:
                     await db.questions.insert_many(extreme_questions)
