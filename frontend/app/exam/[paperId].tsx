@@ -401,10 +401,6 @@ export default function ExamScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.exitButton} onPress={handleExit}>
-          <MaterialCommunityIcons name="close" size={22} color="#F8FAFC" />
-        </TouchableOpacity>
-        
         <TouchableOpacity
           style={styles.questionCounter}
           onPress={() => setShowNavigator(true)}
