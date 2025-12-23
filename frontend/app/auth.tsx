@@ -93,10 +93,13 @@ export default function AuthScreen() {
             {/* Logo and Title */}
             <View style={styles.header}>
               <View style={styles.logoContainer}>
-                <MaterialCommunityIcons name="school" size={48} color="#3B82F6" />
+                <View style={styles.logoBadge}>
+                  <MaterialCommunityIcons name="school" size={36} color="#FFFFFF" />
+                </View>
+                <View style={styles.logoAccent} />
               </View>
-              <Text style={styles.appTitle}>OPSC Exam Prep</Text>
-              <Text style={styles.appSubtitle}>Your path to success</Text>
+              <Text style={styles.appTitle}>PrepBuddy</Text>
+              <Text style={styles.appSubtitle}>Practice Effortlessly for OPSC</Text>
             </View>
 
             {/* Auth Form */}
