@@ -72,6 +72,8 @@ export default function ExamScreen() {
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<string[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(5400); // 90 minutes
   const [showTimer, setShowTimerState] = useState(true);
+  const [showingFeedback, setShowingFeedback] = useState(false);
+  const [feedbackAnswer, setFeedbackAnswer] = useState<number | null>(null);
 
   // Data states
   const [questions, setQuestions] = useState<Question[]>([]);
