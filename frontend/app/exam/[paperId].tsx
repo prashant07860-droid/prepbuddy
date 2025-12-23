@@ -991,6 +991,33 @@ const styles = StyleSheet.create({
   optionTextSelected: {
     color: '#F8FAFC',
   },
+  // Feedback styles for correct/wrong answers
+  optionCorrect: {
+    backgroundColor: '#14532D',
+    borderColor: '#22C55E',
+  },
+  optionWrong: {
+    backgroundColor: '#450A0A',
+    borderColor: '#EF4444',
+  },
+  optionIndexCorrect: {
+    backgroundColor: '#22C55E',
+  },
+  optionIndexWrong: {
+    backgroundColor: '#EF4444',
+  },
+  optionIndexTextFeedback: {
+    color: '#FFFFFF',
+  },
+  optionTextCorrect: {
+    color: '#86EFAC',
+  },
+  optionTextWrong: {
+    color: '#FCA5A5',
+  },
+  feedbackIcon: {
+    marginLeft: 8,
+  },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
