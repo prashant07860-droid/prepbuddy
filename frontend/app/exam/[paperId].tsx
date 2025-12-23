@@ -440,34 +440,56 @@ export default function ExamScreen() {
         </Text>
 
         <View style={styles.optionsContainer}>
-          {currentQuestion?.options.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.optionButton,
-                selectedAnswer === index && styles.optionSelected,
-              ]}
-              onPress={() => setAnswer(currentQuestion.id, index)}
-            >
-              <View style={[
-                styles.optionIndex,
-                selectedAnswer === index && styles.optionIndexSelected,
-              ]}>
-                <Text style={[
-                  styles.optionIndexText,
-                  selectedAnswer === index && styles.optionIndexTextSelected,
+          {currentQuestion?.options.map((option, index) => {
+            const isSelected = selectedAnswer === index;
+            const isCorrectOption = currentQuestion.correct_option === index;
+            const isWrongSelection = showingFeedback && feedbackAnswer === index && !isCorrectOption;
+            const showCorrectHighlight = showingFeedback && isCorrectOption;
+            const showWrongHighlight = isWrongSelection;
+            
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.optionButton,
+                  isSelected && !showingFeedback && styles.optionSelected,
+                  showCorrectHighlight && styles.optionCorrect,
+                  showWrongHighlight && styles.optionWrong,
+                ]}
+                onPress={() => setAnswer(currentQuestion.id, index)}
+                disabled={showingFeedback}
+              >
+                <View style={[
+                  styles.optionIndex,
+                  isSelected && !showingFeedback && styles.optionIndexSelected,
+                  showCorrectHighlight && styles.optionIndexCorrect,
+                  showWrongHighlight && styles.optionIndexWrong,
                 ]}>
-                  {String.fromCharCode(65 + index)}
+                  <Text style={[
+                    styles.optionIndexText,
+                    isSelected && !showingFeedback && styles.optionIndexTextSelected,
+                    (showCorrectHighlight || showWrongHighlight) && styles.optionIndexTextFeedback,
+                  ]}>
+                    {String.fromCharCode(65 + index)}
+                  </Text>
+                </View>
+                <Text style={[
+                  styles.optionText,
+                  isSelected && !showingFeedback && styles.optionTextSelected,
+                  showCorrectHighlight && styles.optionTextCorrect,
+                  showWrongHighlight && styles.optionTextWrong,
+                ]}>
+                  {option}
                 </Text>
-              </View>
-              <Text style={[
-                styles.optionText,
-                selectedAnswer === index && styles.optionTextSelected,
-              ]}>
-                {option}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                {showCorrectHighlight && (
+                  <MaterialCommunityIcons name="check-circle" size={24} color="#22C55E" style={styles.feedbackIcon} />
+                )}
+                {showWrongHighlight && (
+                  <MaterialCommunityIcons name="close-circle" size={24} color="#EF4444" style={styles.feedbackIcon} />
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
 
