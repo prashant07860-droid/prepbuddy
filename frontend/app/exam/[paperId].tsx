@@ -333,9 +333,15 @@ export default function ExamScreen() {
                 </Text>
               </View>
               <View style={styles.preExamInfoItem}>
-                <MaterialCommunityIcons name="check-circle" size={18} color="#94A3B8" />
+                <MaterialCommunityIcons name="check-circle" size={18} color="#22C55E" />
                 <Text style={styles.preExamInfoText}>
-                  +1 for correct, 0 for wrong
+                  +1 mark for each correct answer
+                </Text>
+              </View>
+              <View style={styles.preExamInfoItem}>
+                <MaterialCommunityIcons name="close-circle" size={18} color="#EF4444" />
+                <Text style={styles.preExamInfoText}>
+                  -0.25 mark for each wrong answer (Negative Marking)
                 </Text>
               </View>
               <View style={styles.preExamInfoItem}>
