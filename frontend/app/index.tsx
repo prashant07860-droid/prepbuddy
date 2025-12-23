@@ -366,14 +366,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#1E293B',
   },
+  brandSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandText: {
+    marginLeft: 12,
+  },
   welcomeText: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '800',
     color: '#F8FAFC',
+    letterSpacing: -0.5,
+  },
+  tagline: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 1,
   },
   subtitle: {
     fontSize: 14,
@@ -395,6 +408,33 @@ const styles = StyleSheet.create({
   profileButtonActive: {
     borderWidth: 2,
     borderColor: '#22C55E',
+  },
+  heroBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1E293B',
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  heroContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  heroTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    marginBottom: 6,
+  },
+  heroSubtitle: {
+    fontSize: 13,
+    color: '#94A3B8',
+    lineHeight: 18,
   },
   scrollView: {
     flex: 1,
