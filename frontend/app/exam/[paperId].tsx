@@ -234,15 +234,23 @@ export default function ExamScreen() {
   };
 
   const setAnswer = (questionId: string, optionIndex: number) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
+    // Don't allow changing answer while showing feedback
+    if (showingFeedback) return;
     
-    // Auto-advance to next question after a short delay
+    setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
+    setFeedbackAnswer(optionIndex);
+    setShowingFeedback(true);
+    
+    // Show feedback for 1.2 seconds, then advance to next question
     setTimeout(() => {
+      setShowingFeedback(false);
+      setFeedbackAnswer(null);
+      
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         scrollRef.current?.scrollTo({ y: 0, animated: true });
       }
-    }, 300);
+    }, 1200);
   };
 
   const toggleBookmark = (questionId: string) => {
