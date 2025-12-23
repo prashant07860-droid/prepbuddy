@@ -271,6 +271,12 @@ SUBJECTS_DATA = [
         "description": "National, International current events and developments",
         "icon": "newspaper",
         "color": "#0EA5E9"
+    },
+    {
+        "name": "Agriculture",
+        "description": "Agronomy, Soil Science, Horticulture, Plant Pathology, Entomology, Genetics",
+        "icon": "sprout",
+        "color": "#84CC16"
     }
 ]
 
