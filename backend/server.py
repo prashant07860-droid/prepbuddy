@@ -394,11 +394,11 @@ QUESTION_TEMPLATES = {
 # Import all high-quality question databases
 from questions_polity import POLITY_QUESTIONS
 from questions_geography import GEOGRAPHY_QUESTIONS
-from questions_history_modern import MODERN_HISTORY_QUESTIONS
+from questions_history_modern import HISTORY_MODERN_INDIA_QUESTIONS
 from questions_ethics import ETHICS_QUESTIONS
-from questions_science import SCIENCE_TECH_QUESTIONS
+from questions_science import SCIENCE_TECHNOLOGY_QUESTIONS
 from questions_economics import ECONOMICS_QUESTIONS
-from questions_environment import ENVIRONMENT_QUESTIONS
+from questions_environment import ENVIRONMENT_ECOLOGY_QUESTIONS
 from questions_ancient_history import ANCIENT_MEDIEVAL_HISTORY_QUESTIONS
 from questions_indian_society import INDIAN_SOCIETY_QUESTIONS
 from questions_odisha import ODISHA_QUESTIONS
@@ -408,11 +408,11 @@ from questions_current_affairs import CURRENT_AFFAIRS_QUESTIONS
 QUESTIONS_DATABASE = {
     "Polity": POLITY_QUESTIONS,
     "Geography": GEOGRAPHY_QUESTIONS,
-    "History of Modern India": MODERN_HISTORY_QUESTIONS,
+    "History of Modern India": HISTORY_MODERN_INDIA_QUESTIONS,
     "Ethics": ETHICS_QUESTIONS,
-    "Science and Technology": SCIENCE_TECH_QUESTIONS,
+    "Science and Technology": SCIENCE_TECHNOLOGY_QUESTIONS,
     "Economics": ECONOMICS_QUESTIONS,
-    "Environment and Ecology": ENVIRONMENT_QUESTIONS,
+    "Environment and Ecology": ENVIRONMENT_ECOLOGY_QUESTIONS,
     "Ancient & Medieval Indian History": ANCIENT_MEDIEVAL_HISTORY_QUESTIONS,
     "Indian Society & Social Issues": INDIAN_SOCIETY_QUESTIONS,
     "Odisha-Specific Studies": ODISHA_QUESTIONS,
