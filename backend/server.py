@@ -409,6 +409,7 @@ from questions_ancient_history import ANCIENT_MEDIEVAL_HISTORY_QUESTIONS
 from questions_indian_society import INDIAN_SOCIETY_QUESTIONS
 from questions_odisha import ODISHA_QUESTIONS
 from questions_current_affairs import CURRENT_AFFAIRS_QUESTIONS
+from questions_agriculture import AGRICULTURE_QUESTIONS
 
 # Map subject names to question databases
 QUESTIONS_DATABASE = {
@@ -423,6 +424,7 @@ QUESTIONS_DATABASE = {
     "Indian Society & Social Issues": INDIAN_SOCIETY_QUESTIONS,
     "Odisha-Specific Studies": ODISHA_QUESTIONS,
     "Current Affairs": CURRENT_AFFAIRS_QUESTIONS,
+    "Agriculture": AGRICULTURE_QUESTIONS,
 }
 
 def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, is_master: bool = False, paper_seed: int = 0) -> List[dict]:
