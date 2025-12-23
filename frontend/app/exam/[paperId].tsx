@@ -768,13 +768,13 @@ export default function ExamScreen() {
         visible={showAnswerKey}
         animationType="slide"
         transparent={false}
-        onRequestClose={() => setShowAnswerKey(false)}
+        onRequestClose={() => router.replace('/')}
       >
         <SafeAreaView style={styles.answerKeyContainer}>
           <View style={styles.answerKeyHeader}>
             <TouchableOpacity
               style={styles.answerKeyBackButton}
-              onPress={() => setShowAnswerKey(false)}
+              onPress={() => router.replace('/')}
             >
               <MaterialCommunityIcons name="arrow-left" size={24} color="#F8FAFC" />
             </TouchableOpacity>
