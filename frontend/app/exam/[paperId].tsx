@@ -338,6 +338,25 @@ export default function ExamScreen() {
               </View>
             </View>
 
+            {/* Resubmission Toggle */}
+            <TouchableOpacity
+              style={styles.resubmissionToggle}
+              onPress={() => setAllowResubmission(!allowResubmission)}
+              activeOpacity={0.7}
+            >
+              <View style={[
+                styles.checkbox,
+                allowResubmission && styles.checkboxChecked
+              ]}>
+                {allowResubmission && (
+                  <MaterialCommunityIcons name="check" size={16} color="#FFFFFF" />
+                )}
+              </View>
+              <Text style={styles.resubmissionText}>
+                Allow resubmission of previously answered questions
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.startButton}
               onPress={handleStartExam}
