@@ -74,6 +74,7 @@ export default function ExamScreen() {
   const [showTimer, setShowTimerState] = useState(true);
   const [showingFeedback, setShowingFeedback] = useState(false);
   const [feedbackAnswer, setFeedbackAnswer] = useState<number | null>(null);
+  const [allowResubmission, setAllowResubmission] = useState(true); // Allow changing answers by default
 
   // Data states
   const [questions, setQuestions] = useState<Question[]>([]);
