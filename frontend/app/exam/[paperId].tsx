@@ -633,20 +633,33 @@ export default function ExamScreen() {
             <View style={styles.resultStats}>
               <View style={styles.resultStatItem}>
                 <View style={[styles.resultStatDot, { backgroundColor: '#22C55E' }]} />
-                <Text style={styles.resultStatText}>Correct: {finalResult?.correct}</Text>
+                <Text style={styles.resultStatText}>Correct: {finalResult?.correct} (+{finalResult?.correct})</Text>
               </View>
               <View style={styles.resultStatItem}>
                 <View style={[styles.resultStatDot, { backgroundColor: '#EF4444' }]} />
-                <Text style={styles.resultStatText}>Wrong: {finalResult?.wrong}</Text>
+                <Text style={styles.resultStatText}>Wrong: {finalResult?.wrong} (-{((finalResult?.wrong || 0) * 0.25).toFixed(2)})</Text>
               </View>
               <View style={styles.resultStatItem}>
                 <View style={[styles.resultStatDot, { backgroundColor: '#64748B' }]} />
-                <Text style={styles.resultStatText}>Skipped: {finalResult?.skipped}</Text>
+                <Text style={styles.resultStatText}>Skipped: {finalResult?.skipped} (0)</Text>
+              </View>
+              <View style={styles.resultStatItem}>
+                <MaterialCommunityIcons name="calculator" size={16} color="#3B82F6" />
+                <Text style={[styles.resultStatText, { color: '#3B82F6', fontWeight: '700' }]}>
+                  Final Score: {finalResult?.rawScore}/{finalResult?.maxScore}
+                </Text>
               </View>
               <View style={styles.resultStatItem}>
                 <MaterialCommunityIcons name="clock-outline" size={16} color="#94A3B8" />
                 <Text style={styles.resultStatText}>Time: {finalResult?.timeTaken}</Text>
               </View>
+            </View>
+
+            <View style={styles.negativeMarkingNote}>
+              <MaterialCommunityIcons name="alert-circle-outline" size={14} color="#F59E0B" />
+              <Text style={styles.negativeMarkingText}>
+                Negative Marking: -0.25 per wrong answer
+              </Text>
             </View>
 
             <TouchableOpacity
