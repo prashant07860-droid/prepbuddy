@@ -391,95 +391,122 @@ QUESTION_TEMPLATES = {
 
 # ============ HELPER FUNCTIONS ============
 
-# Import real questions database
-from real_questions import REAL_QUESTIONS_DATABASE
-# Import extreme difficulty questions
-from extreme_questions import EXTREME_QUESTIONS_DATABASE
+# Import all high-quality question databases
+from questions_polity import POLITY_QUESTIONS
+from questions_geography import GEOGRAPHY_QUESTIONS
+from questions_history_modern import MODERN_HISTORY_QUESTIONS
+from questions_ethics import ETHICS_QUESTIONS
+from questions_science import SCIENCE_TECH_QUESTIONS
+from questions_economics import ECONOMICS_QUESTIONS
+from questions_environment import ENVIRONMENT_QUESTIONS
+from questions_ancient_history import ANCIENT_MEDIEVAL_HISTORY_QUESTIONS
+from questions_indian_society import INDIAN_SOCIETY_QUESTIONS
+from questions_odisha import ODISHA_QUESTIONS
+from questions_current_affairs import CURRENT_AFFAIRS_QUESTIONS
 
-def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, is_master: bool = False) -> List[dict]:
-    """Generate OPSC questions using real PYQ database for the subject"""
+# Map subject names to question databases
+QUESTIONS_DATABASE = {
+    "Polity": POLITY_QUESTIONS,
+    "Geography": GEOGRAPHY_QUESTIONS,
+    "History of Modern India": MODERN_HISTORY_QUESTIONS,
+    "Ethics": ETHICS_QUESTIONS,
+    "Science and Technology": SCIENCE_TECH_QUESTIONS,
+    "Economics": ECONOMICS_QUESTIONS,
+    "Environment and Ecology": ENVIRONMENT_QUESTIONS,
+    "Ancient & Medieval Indian History": ANCIENT_MEDIEVAL_HISTORY_QUESTIONS,
+    "Indian Society & Social Issues": INDIAN_SOCIETY_QUESTIONS,
+    "Odisha-Specific Studies": ODISHA_QUESTIONS,
+    "Current Affairs": CURRENT_AFFAIRS_QUESTIONS,
+}
+
+def generate_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, is_master: bool = False, paper_seed: int = 0) -> List[dict]:
+    """Generate OPSC questions using high-quality question database for the subject"""
     questions = []
     
-    # Get real questions for this subject
-    real_questions = REAL_QUESTIONS_DATABASE.get(subject_name, [])
+    # Get questions for this subject
+    subject_questions = QUESTIONS_DATABASE.get(subject_name, [])
     
-    if not real_questions:
-        # Fallback to template if no real questions available
-        real_questions = REAL_QUESTIONS_DATABASE.get("Polity", [])
+    if not subject_questions:
+        # Fallback to Polity if no questions available
+        subject_questions = QUESTIONS_DATABASE.get("Polity", [])
+    
+    # Create a deterministic shuffle based on paper_seed for variety
+    shuffled_questions = subject_questions.copy()
+    random.seed(paper_seed)
+    random.shuffle(shuffled_questions)
+    
+    # For master papers, prioritize harder questions
+    if is_master:
+        hard_questions = [q for q in shuffled_questions if q.get("difficulty") in ["hard", "extreme"]]
+        medium_questions = [q for q in shuffled_questions if q.get("difficulty") == "medium"]
+        easy_questions = [q for q in shuffled_questions if q.get("difficulty") == "easy"]
+        shuffled_questions = hard_questions + medium_questions + easy_questions
     
     # Create questions for this paper
     for i in range(count):
-        # Cycle through real questions if we need more than available
-        real_q = real_questions[i % len(real_questions)]
-        
-        # For master papers, prefer harder questions
-        if is_master and real_q.get("difficulty") == "easy" and i < len(real_questions):
-            # Try to find a harder question
-            for q in real_questions:
-                if q.get("difficulty") in ["medium", "hard"]:
-                    real_q = q
-                    break
+        # Cycle through questions if we need more than available
+        source_q = shuffled_questions[i % len(shuffled_questions)]
         
         question = {
             "id": str(uuid.uuid4()),
             "paper_id": paper_id,
             "subject_id": subject_id,
             "question_number": i + 1,
-            "question_text": real_q["question_text"],
-            "options": real_q["options"].copy(),
-            "correct_option": real_q["correct_option"],
-            "explanation": real_q.get("explanation", f"This question tests knowledge of {real_q.get('topic', subject_name)}."),
-            "difficulty": real_q.get("difficulty", "medium"),
-            "topic": real_q.get("topic", subject_name)
+            "question_text": source_q["question_text"],
+            "options": source_q["options"].copy(),
+            "correct_option": source_q["correct_option"],
+            "explanation": source_q.get("explanation", f"This question tests knowledge of {source_q.get('topic', subject_name)}."),
+            "difficulty": source_q.get("difficulty", "medium"),
+            "topic": source_q.get("topic", subject_name)
         }
         questions.append(question)
     
-    # Shuffle questions for variety in different papers
-    random.shuffle(questions)
-    
-    # Re-number after shuffle
-    for i, q in enumerate(questions):
-        q["question_number"] = i + 1
+    # Reset random seed
+    random.seed()
     
     return questions
 
 
-def generate_extreme_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100) -> List[dict]:
-    """Generate extreme difficulty questions using the extreme questions database"""
+def generate_extreme_questions_for_subject(subject_name: str, paper_id: str, subject_id: str, count: int = 100, paper_seed: int = 0) -> List[dict]:
+    """Generate extreme difficulty questions - pick only hard questions from the database"""
     questions = []
     
-    # Get extreme questions for this subject
-    extreme_questions = EXTREME_QUESTIONS_DATABASE.get(subject_name, [])
+    # Get questions for this subject
+    subject_questions = QUESTIONS_DATABASE.get(subject_name, [])
     
-    if not extreme_questions:
-        # Fallback to Polity extreme questions if subject not found
-        extreme_questions = EXTREME_QUESTIONS_DATABASE.get("Polity", [])
+    if not subject_questions:
+        subject_questions = QUESTIONS_DATABASE.get("Polity", [])
+    
+    # Filter to only hard/extreme questions first
+    hard_questions = [q for q in subject_questions if q.get("difficulty") in ["hard", "extreme"]]
+    if len(hard_questions) < 20:
+        # If not enough hard questions, include medium as well
+        hard_questions = [q for q in subject_questions if q.get("difficulty") in ["hard", "extreme", "medium"]]
+    
+    # Create a deterministic shuffle based on paper_seed
+    random.seed(paper_seed + 1000)  # Different seed from regular papers
+    random.shuffle(hard_questions)
     
     # Create questions for this paper
     for i in range(count):
-        # Cycle through extreme questions if we need more than available
-        extreme_q = extreme_questions[i % len(extreme_questions)]
+        source_q = hard_questions[i % len(hard_questions)]
         
         question = {
             "id": str(uuid.uuid4()),
             "paper_id": paper_id,
             "subject_id": subject_id,
             "question_number": i + 1,
-            "question_text": extreme_q["question_text"],
-            "options": extreme_q["options"].copy(),
-            "correct_option": extreme_q["correct_option"],
-            "explanation": extreme_q.get("explanation", f"This is an extreme difficulty question testing deep knowledge of {extreme_q.get('topic', subject_name)}."),
-            "difficulty": "extreme",  # Always mark as extreme
-            "topic": extreme_q.get("topic", subject_name)
+            "question_text": source_q["question_text"],
+            "options": source_q["options"].copy(),
+            "correct_option": source_q["correct_option"],
+            "explanation": source_q.get("explanation", f"This is an extreme difficulty question testing deep knowledge of {source_q.get('topic', subject_name)}."),
+            "difficulty": "extreme",  # Mark as extreme
+            "topic": source_q.get("topic", subject_name)
         }
         questions.append(question)
     
-    # Shuffle questions for variety in different papers
-    random.shuffle(questions)
-    
-    # Re-number after shuffle
-    for i, q in enumerate(questions):
-        q["question_number"] = i + 1
+    # Reset random seed
+    random.seed()
     
     return questions
 
