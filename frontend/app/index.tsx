@@ -282,11 +282,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.welcomeText}>OPSC Exam Prep</Text>
-          <Text style={styles.subtitle}>
-            {user ? `Welcome, ${user.name}` : isGuest ? 'Guest Mode' : 'Master your preparation'}
-          </Text>
+        <View style={styles.brandSection}>
+          <PrepBuddyLogo size={44} />
+          <View style={styles.brandText}>
+            <Text style={styles.welcomeText}>PrepBuddy</Text>
+            <Text style={styles.tagline}>Your OPSC Preparation Partner</Text>
+          </View>
         </View>
         <View style={styles.headerButtons}>
           <TouchableOpacity
@@ -306,6 +307,19 @@ export default function HomeScreen() {
             />
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* Hero Banner */}
+      <View style={styles.heroBanner}>
+        <View style={styles.heroContent}>
+          <Text style={styles.heroTitle}>
+            {user ? `Welcome back, ${user.name?.split(' ')[0]}!` : isGuest ? 'Practice Mode' : 'Start Practicing'}
+          </Text>
+          <Text style={styles.heroSubtitle}>
+            Practice effortlessly with PrepBuddy. 12 subjects, 31,200+ questions.
+          </Text>
+        </View>
+        <MaterialCommunityIcons name="rocket-launch" size={48} color="#3B82F6" style={{ opacity: 0.3 }} />
       </View>
 
       <ScrollView
