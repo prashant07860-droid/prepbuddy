@@ -64,6 +64,8 @@ export default function ExamScreen() {
     wrong: number;
     skipped: number;
     scorePercentage: number;
+    rawScore: string;
+    maxScore: number;
     timeTaken: string;
   } | null>(null);
 
