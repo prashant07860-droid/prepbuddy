@@ -643,6 +643,17 @@ export default function ExamScreen() {
             </View>
 
             <TouchableOpacity
+              style={styles.answerKeyButton}
+              onPress={() => {
+                setShowResultModal(false);
+                setShowAnswerKey(true);
+              }}
+            >
+              <MaterialCommunityIcons name="key-variant" size={20} color="#3B82F6" />
+              <Text style={styles.answerKeyButtonText}>View Answer Key</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={styles.resultHomeButton}
               onPress={() => router.replace('/')}
             >
