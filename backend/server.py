@@ -1149,11 +1149,12 @@ async def reseed_database():
         await db.settings.insert_one(default_settings.dict())
         
         return {
-            "message": "Database reseeded successfully with real PYQs and extreme papers",
+            "message": "Database reseeded successfully with high-quality OPSC questions",
             "subjects": len(subjects_created),
             "papers": total_papers,
             "questions": total_questions,
-            "extreme_papers_per_subject": 5
+            "extreme_papers_per_subject": 5,
+            "question_sources": list(QUESTIONS_DATABASE.keys())
         }
         
     except Exception as e:
