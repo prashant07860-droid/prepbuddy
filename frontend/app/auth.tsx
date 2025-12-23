@@ -295,8 +295,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#0F172A',
   },
-    marginBottom: 16,
-  },
   appTitle: {
     fontSize: 28,
     fontWeight: '700',
