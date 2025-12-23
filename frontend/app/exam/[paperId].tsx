@@ -58,6 +58,7 @@ export default function ExamScreen() {
   const [startTime, setStartTime] = useState<number>(0);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [showAnswerKey, setShowAnswerKey] = useState(false);
   const [finalResult, setFinalResult] = useState<{
     correct: number;
     wrong: number;
