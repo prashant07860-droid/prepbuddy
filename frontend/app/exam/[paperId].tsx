@@ -1090,6 +1090,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E293B',
     borderRadius: 10,
   },
+  navButtonPlaceholder: {
+    width: 80, // Same approximate width as Prev button
+  },
   navButtonDisabled: {
     opacity: 0.5,
   },
