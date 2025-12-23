@@ -1566,6 +1566,21 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
     marginLeft: 8,
   },
+  negativeMarkingNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#422006',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 16,
+    width: '100%',
+  },
+  negativeMarkingText: {
+    fontSize: 12,
+    color: '#FCD34D',
+    marginLeft: 6,
+  },
   // Answer Key Modal Styles
   answerKeyContainer: {
     flex: 1,
