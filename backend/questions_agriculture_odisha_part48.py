@@ -519,4 +519,36 @@ AGRICULTURE_ODISHA_PART48_QUESTIONS = [
         "difficulty": "medium",
         "topic": "Research Institutes"
     },
+    {
+        "question_text": "The 'Krishi Vigyan Kendra' (KVK) in each district of Odisha primarily functions to:",
+        "options": ["Seed production and distribution", "Technology assessment, refinement, and frontline demonstrations", "Agricultural credit disbursement", "Land revenue collection"],
+        "correct_option": 1,
+        "explanation": "KVKs assess, refine, and demonstrate location-specific agricultural technologies through On-Farm Testing (OFT), Frontline Demonstrations (FLD), vocational training to farmers, farm women, and rural youth, acting as knowledge resource centers.",
+        "difficulty": "medium",
+        "topic": "Research Institutes"
+    },
+    {
+        "question_text": "Which traditional agricultural practice in Odisha involves intercropping of pulses in standing rice crop near maturity?",
+        "options": ["Relay cropping", "Paira cropping", "Mixed cropping", "Ratoon cropping"],
+        "correct_option": 1,
+        "explanation": "Paira cropping is a unique practice where short-duration pulses (mung, biri) or oilseeds are broadcast in standing rice 15-20 days before harvest. They germinate using residual moisture after rice harvest, saving time and utilizing resources efficiently.",
+        "difficulty": "medium",
+        "topic": "Cropping Pattern"
+    },
+    {
+        "question_text": "The 'Subhadra Yojana' announced in Odisha aims to provide financial support to:",
+        "options": ["All women farmers", "Women aged 21-60 years for empowerment", "Only SC/ST women", "Only widows"],
+        "correct_option": 1,
+        "explanation": "Subhadra Yojana (announced in 2024) provides financial assistance to women aged 21-60 years to enhance their economic independence. While not exclusively agricultural, it supports rural women including those from farming families, promoting livelihood activities.",
+        "difficulty": "easy",
+        "topic": "Government Schemes"
+    },
+    {
+        "question_text": "The 'precision farming' approach promoted in parts of Odisha emphasizes:",
+        "options": ["Traditional broadcasting methods", "Site-specific crop management using technology (GPS, sensors)", "Maximum chemical input use", "Continuous monocropping"],
+        "correct_option": 1,
+        "explanation": "Precision farming uses GPS, soil sensors, drones, and data analytics for site-specific management of inputs (seed, fertilizer, water, pesticides), optimizing resource use, reducing waste, increasing profitability, and minimizing environmental impact.",
+        "difficulty": "medium",
+        "topic": "Cropping Pattern"
+    },
 ]
