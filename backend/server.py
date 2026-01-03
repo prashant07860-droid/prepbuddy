@@ -409,7 +409,110 @@ from questions_ancient_history import ANCIENT_MEDIEVAL_HISTORY_QUESTIONS
 from questions_indian_society import INDIAN_SOCIETY_QUESTIONS
 from questions_odisha import ODISHA_QUESTIONS
 from questions_current_affairs import CURRENT_AFFAIRS_QUESTIONS
-from questions_agriculture import AGRICULTURE_QUESTIONS
+
+# Import all 48 Agriculture (Odisha-specific) question files
+from questions_agriculture_odisha_part1 import AGRICULTURE_ODISHA_PART1_QUESTIONS
+from questions_agriculture_odisha_part2 import AGRICULTURE_ODISHA_PART2_QUESTIONS
+from questions_agriculture_odisha_part3 import AGRICULTURE_ODISHA_PART3_QUESTIONS
+from questions_agriculture_odisha_part4 import AGRICULTURE_ODISHA_PART4_QUESTIONS
+from questions_agriculture_odisha_part5 import AGRICULTURE_ODISHA_PART5_QUESTIONS
+from questions_agriculture_odisha_part6 import AGRICULTURE_ODISHA_PART6_QUESTIONS
+from questions_agriculture_odisha_part7 import AGRICULTURE_ODISHA_PART7_QUESTIONS
+from questions_agriculture_odisha_part8 import AGRICULTURE_ODISHA_PART8_QUESTIONS
+from questions_agriculture_odisha_part9 import AGRICULTURE_ODISHA_PART9_QUESTIONS
+from questions_agriculture_odisha_part10 import AGRICULTURE_ODISHA_PART10_QUESTIONS
+from questions_agriculture_odisha_part11 import AGRICULTURE_ODISHA_PART11_QUESTIONS
+from questions_agriculture_odisha_part12 import AGRICULTURE_ODISHA_PART12_QUESTIONS
+from questions_agriculture_odisha_part13 import AGRICULTURE_ODISHA_PART13_QUESTIONS
+from questions_agriculture_odisha_part14 import AGRICULTURE_ODISHA_PART14_QUESTIONS
+from questions_agriculture_odisha_part15 import AGRICULTURE_ODISHA_PART15_QUESTIONS
+from questions_agriculture_odisha_part16 import AGRICULTURE_ODISHA_PART16_QUESTIONS
+from questions_agriculture_odisha_part17 import AGRICULTURE_ODISHA_PART17_QUESTIONS
+from questions_agriculture_odisha_part18 import AGRICULTURE_ODISHA_PART18_QUESTIONS
+from questions_agriculture_odisha_part19 import AGRICULTURE_ODISHA_PART19_QUESTIONS
+from questions_agriculture_odisha_part20 import AGRICULTURE_ODISHA_PART20_QUESTIONS
+from questions_agriculture_odisha_part21 import AGRICULTURE_ODISHA_PART21_QUESTIONS
+from questions_agriculture_odisha_part22 import AGRICULTURE_ODISHA_PART22_QUESTIONS
+from questions_agriculture_odisha_part23 import AGRICULTURE_ODISHA_PART23_QUESTIONS
+from questions_agriculture_odisha_part24 import AGRICULTURE_ODISHA_PART24_QUESTIONS
+from questions_agriculture_odisha_part25 import AGRICULTURE_ODISHA_PART25_QUESTIONS
+from questions_agriculture_odisha_part26 import AGRICULTURE_ODISHA_PART26_QUESTIONS
+from questions_agriculture_odisha_part27 import AGRICULTURE_ODISHA_PART27_QUESTIONS
+from questions_agriculture_odisha_part28 import AGRICULTURE_ODISHA_PART28_QUESTIONS
+from questions_agriculture_odisha_part29 import AGRICULTURE_ODISHA_PART29_QUESTIONS
+from questions_agriculture_odisha_part30 import AGRICULTURE_ODISHA_PART30_QUESTIONS
+from questions_agriculture_odisha_part31 import AGRICULTURE_ODISHA_PART31_QUESTIONS
+from questions_agriculture_odisha_part32 import AGRICULTURE_ODISHA_PART32_QUESTIONS
+from questions_agriculture_odisha_part33 import AGRICULTURE_ODISHA_PART33_QUESTIONS
+from questions_agriculture_odisha_part34 import AGRICULTURE_ODISHA_PART34_QUESTIONS
+from questions_agriculture_odisha_part35 import AGRICULTURE_ODISHA_PART35_QUESTIONS
+from questions_agriculture_odisha_part36 import AGRICULTURE_ODISHA_PART36_QUESTIONS
+from questions_agriculture_odisha_part37 import AGRICULTURE_ODISHA_PART37_QUESTIONS
+from questions_agriculture_odisha_part38 import AGRICULTURE_ODISHA_PART38_QUESTIONS
+from questions_agriculture_odisha_part39 import AGRICULTURE_ODISHA_PART39_QUESTIONS
+from questions_agriculture_odisha_part40 import AGRICULTURE_ODISHA_PART40_QUESTIONS
+from questions_agriculture_odisha_part41 import AGRICULTURE_ODISHA_PART41_QUESTIONS
+from questions_agriculture_odisha_part42 import AGRICULTURE_ODISHA_PART42_QUESTIONS
+from questions_agriculture_odisha_part43 import AGRICULTURE_ODISHA_PART43_QUESTIONS
+from questions_agriculture_odisha_part44 import AGRICULTURE_ODISHA_PART44_QUESTIONS
+from questions_agriculture_odisha_part45 import AGRICULTURE_ODISHA_PART45_QUESTIONS
+from questions_agriculture_odisha_part46 import AGRICULTURE_ODISHA_PART46_QUESTIONS
+from questions_agriculture_odisha_part47 import AGRICULTURE_ODISHA_PART47_QUESTIONS
+from questions_agriculture_odisha_part48 import AGRICULTURE_ODISHA_PART48_QUESTIONS
+
+# Combine all Agriculture questions into one comprehensive list (2,600 total)
+AGRICULTURE_QUESTIONS = (
+    AGRICULTURE_ODISHA_PART1_QUESTIONS +
+    AGRICULTURE_ODISHA_PART2_QUESTIONS +
+    AGRICULTURE_ODISHA_PART3_QUESTIONS +
+    AGRICULTURE_ODISHA_PART4_QUESTIONS +
+    AGRICULTURE_ODISHA_PART5_QUESTIONS +
+    AGRICULTURE_ODISHA_PART6_QUESTIONS +
+    AGRICULTURE_ODISHA_PART7_QUESTIONS +
+    AGRICULTURE_ODISHA_PART8_QUESTIONS +
+    AGRICULTURE_ODISHA_PART9_QUESTIONS +
+    AGRICULTURE_ODISHA_PART10_QUESTIONS +
+    AGRICULTURE_ODISHA_PART11_QUESTIONS +
+    AGRICULTURE_ODISHA_PART12_QUESTIONS +
+    AGRICULTURE_ODISHA_PART13_QUESTIONS +
+    AGRICULTURE_ODISHA_PART14_QUESTIONS +
+    AGRICULTURE_ODISHA_PART15_QUESTIONS +
+    AGRICULTURE_ODISHA_PART16_QUESTIONS +
+    AGRICULTURE_ODISHA_PART17_QUESTIONS +
+    AGRICULTURE_ODISHA_PART18_QUESTIONS +
+    AGRICULTURE_ODISHA_PART19_QUESTIONS +
+    AGRICULTURE_ODISHA_PART20_QUESTIONS +
+    AGRICULTURE_ODISHA_PART21_QUESTIONS +
+    AGRICULTURE_ODISHA_PART22_QUESTIONS +
+    AGRICULTURE_ODISHA_PART23_QUESTIONS +
+    AGRICULTURE_ODISHA_PART24_QUESTIONS +
+    AGRICULTURE_ODISHA_PART25_QUESTIONS +
+    AGRICULTURE_ODISHA_PART26_QUESTIONS +
+    AGRICULTURE_ODISHA_PART27_QUESTIONS +
+    AGRICULTURE_ODISHA_PART28_QUESTIONS +
+    AGRICULTURE_ODISHA_PART29_QUESTIONS +
+    AGRICULTURE_ODISHA_PART30_QUESTIONS +
+    AGRICULTURE_ODISHA_PART31_QUESTIONS +
+    AGRICULTURE_ODISHA_PART32_QUESTIONS +
+    AGRICULTURE_ODISHA_PART33_QUESTIONS +
+    AGRICULTURE_ODISHA_PART34_QUESTIONS +
+    AGRICULTURE_ODISHA_PART35_QUESTIONS +
+    AGRICULTURE_ODISHA_PART36_QUESTIONS +
+    AGRICULTURE_ODISHA_PART37_QUESTIONS +
+    AGRICULTURE_ODISHA_PART38_QUESTIONS +
+    AGRICULTURE_ODISHA_PART39_QUESTIONS +
+    AGRICULTURE_ODISHA_PART40_QUESTIONS +
+    AGRICULTURE_ODISHA_PART41_QUESTIONS +
+    AGRICULTURE_ODISHA_PART42_QUESTIONS +
+    AGRICULTURE_ODISHA_PART43_QUESTIONS +
+    AGRICULTURE_ODISHA_PART44_QUESTIONS +
+    AGRICULTURE_ODISHA_PART45_QUESTIONS +
+    AGRICULTURE_ODISHA_PART46_QUESTIONS +
+    AGRICULTURE_ODISHA_PART47_QUESTIONS +
+    AGRICULTURE_ODISHA_PART48_QUESTIONS
+)
+
+logger.info(f"Loaded {len(AGRICULTURE_QUESTIONS)} Agriculture (Odisha-specific) questions from 48 files")
 
 # Map subject names to question databases
 QUESTIONS_DATABASE = {
