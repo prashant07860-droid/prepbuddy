@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" width="1040" height="400">
+  <title>bubbl</title>
+  <g fill="none" stroke="#F6F3EA" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 22 V158"/><circle cx="58" cy="120" r="38"/>
+    <path d="M134 82 V120 A38 38 0 0 0 210 120 V82 M210 120 V158"/>
+    <path d="M248 22 V158"/><circle cx="286" cy="120" r="38"/>
+    <path d="M362 22 V158"/>
+    <path d="M476 22 V158"/>
+  </g>
+  <circle cx="400" cy="120" r="47" fill="#E5484D"/>
+</svg>
