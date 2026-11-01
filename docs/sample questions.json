@@ -1,0 +1,86 @@
+[
+  {
+    "ext_id": "sample-polity-0001",
+    "bank": "gs",
+    "subject_key": "polity",
+    "topic_key": "fundamental_rights",
+    "subtopic": "Amendments to Part III",
+    "exams": ["ocs", "upsc"],
+    "difficulty": "medium",
+    "type": "statements",
+    "passage_id": null,
+    "text": {
+      "en": "Consider the following statements:\n1. The Right to Property was removed from the list of Fundamental Rights by the 44th Amendment Act, 1978.\n2. Article 21A (Right to Education) was inserted by the 86th Amendment Act, 2002.\n3. The rights under Article 19 are available to foreign citizens living in India.\n\nWhich of the statements given above is/are correct?",
+      "or": ""
+    },
+    "options": {
+      "en": ["1 only", "1 and 2 only", "2 and 3 only", "1, 2 and 3"],
+      "or": ["", "", "", ""]
+    },
+    "correct": 1,
+    "shuffle_ok": false,
+    "explanation": {
+      "en": "Statement 1 is correct: the 44th Amendment (1978) moved the right to property out of Part III; it is now a legal right under Article 300A. Statement 2 is correct: Article 21A was added by the 86th Amendment (2002). Statement 3 is wrong: Article 19 freedoms are available only to citizens of India.",
+      "or": ""
+    },
+    "source": { "kind": "generated", "exam": null, "year": null, "paper": null, "qno": null },
+    "status": "pending",
+    "review": { "checks": { "duplicate_of": null, "ai_agree": true, "ai_answer": 1, "flags": [] }, "note": null }
+  },
+  {
+    "ext_id": "sample-history-odisha-0001",
+    "bank": "gs",
+    "subject_key": "history_odisha",
+    "topic_key": "formation_of_odisha",
+    "subtopic": "Separate province",
+    "exams": ["ocs"],
+    "difficulty": "easy",
+    "type": "single",
+    "passage_id": null,
+    "text": {
+      "en": "On which date did Odisha become a separate province?",
+      "or": "ଓଡ଼ିଶା କେଉଁ ତାରିଖରେ ଏକ ସ୍ୱତନ୍ତ୍ର ପ୍ରଦେଶ ଭାବେ ଗଠିତ ହୋଇଥିଲା?"
+    },
+    "options": {
+      "en": ["1 April 1936", "26 January 1950", "1 April 1912", "15 August 1947"],
+      "or": ["1 ଏପ୍ରିଲ 1936", "26 ଜାନୁଆରୀ 1950", "1 ଏପ୍ରିଲ 1912", "15 ଅଗଷ୍ଟ 1947"]
+    },
+    "correct": 0,
+    "shuffle_ok": true,
+    "explanation": {
+      "en": "Odisha became a separate province on 1 April 1936. The day is celebrated every year as Utkal Divas (Odisha Day).",
+      "or": "ଓଡ଼ିଶା 1 ଏପ୍ରିଲ 1936ରେ ଏକ ସ୍ୱତନ୍ତ୍ର ପ୍ରଦେଶ ଭାବେ ଗଠିତ ହେଲା। ଏହି ଦିନଟି ପ୍ରତିବର୍ଷ ଉତ୍କଳ ଦିବସ ଭାବେ ପାଳନ କରାଯାଏ।"
+    },
+    "source": { "kind": "generated", "exam": null, "year": null, "paper": null, "qno": null },
+    "status": "pending",
+    "review": { "checks": { "duplicate_of": null, "ai_agree": true, "ai_answer": 0, "flags": ["odisha_fact", "translation_low_conf"] }, "note": null }
+  },
+  {
+    "ext_id": "sample-numeracy-0001",
+    "bank": "csat",
+    "subject_key": "numeracy_di",
+    "topic_key": "percentages",
+    "subtopic": null,
+    "exams": ["ocs", "upsc"],
+    "difficulty": "easy",
+    "type": "single",
+    "passage_id": null,
+    "text": {
+      "en": "If 20% of a number is 45, what is 60% of the same number?",
+      "or": ""
+    },
+    "options": {
+      "en": ["135", "90", "120", "150"],
+      "or": ["135", "90", "120", "150"]
+    },
+    "correct": 0,
+    "shuffle_ok": true,
+    "explanation": {
+      "en": "20% of the number = 45, so the number = 45 × 5 = 225. 60% of 225 = 135. Shortcut: 60% is three times 20%, so 3 × 45 = 135.",
+      "or": ""
+    },
+    "source": { "kind": "generated", "exam": null, "year": null, "paper": null, "qno": null },
+    "status": "pending",
+    "review": { "checks": { "duplicate_of": null, "ai_agree": true, "ai_answer": 0, "flags": [] }, "note": null }
+  }
+]
