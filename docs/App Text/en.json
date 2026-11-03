@@ -1,0 +1,223 @@
+{
+  "common": {
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "save": "Save",
+    "retry": "Try again",
+    "back": "Back",
+    "done": "Done",
+    "loading": "Loading…",
+    "offline": "You're offline. Your answers are saved and will sync later.",
+    "error": "Something went wrong. Please try again.",
+    "lang_toggle_en": "EN",
+    "lang_toggle_or": "ଓ"
+  },
+  "brand": {
+    "tagline": "Fill the right bubble."
+  },
+  "onboard": {
+    "pick_exam": "Which exam are you preparing for?",
+    "exam_ocs": "Odisha Civil Services (OCS)",
+    "pick_lang": "Choose your language",
+    "lang_en": "English",
+    "lang_or": "Odia",
+    "lang_both": "Both",
+    "pick_year": "When is your exam?",
+    "start_quiz": "Start today's quiz",
+    "no_signup": "No sign-up needed"
+  },
+  "auth": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "logout": "Log out",
+    "google": "Continue with Google",
+    "name": "Your name",
+    "email": "Email",
+    "password": "Password",
+    "forgot": "Forgot password?",
+    "reset_code": "Enter the code we emailed you",
+    "reset_new": "Choose a new password",
+    "reset_sent": "If that email has an account, a code is on its way.",
+    "bad_login": "Wrong email or password.",
+    "save_streak": "Save your streak. Sign up free."
+  },
+  "home": {
+    "greeting": "Hello, {name}",
+    "streak": "{n}-day streak",
+    "xp": "{n} XP",
+    "daily_quiz": "Today's Daily Quiz",
+    "daily_done": "Done for today. Come back tomorrow!",
+    "continue_level": "Continue {subject}: {level}",
+    "weak_topics": "Your weak topics",
+    "fix_it": "Fix it: 20 questions"
+  },
+  "nav": {
+    "home": "Home",
+    "practice": "Practice",
+    "mocks": "Mocks",
+    "leaderboard": "Leaderboard",
+    "profile": "Profile"
+  },
+  "mode": {
+    "daily": "Daily Quiz",
+    "practice": "Practice Set",
+    "level_test": "Level Test",
+    "mock1": "Full Mock: Paper I",
+    "mock2": "Full Mock: Paper II (CSAT)",
+    "pyq": "Previous Year Papers",
+    "weak": "Weak-Topic Practice",
+    "revision": "Revision"
+  },
+  "practice": {
+    "pick_subject": "Pick a subject",
+    "pick_size": "How many questions?",
+    "extra": "Extra practice"
+  },
+  "level": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "locked": "Locked",
+    "unlocked": "{level} unlocked!",
+    "how_unlock": "Finish {n} more sets at {pct}% or pass the Level Test"
+  },
+  "exam": {
+    "question_of": "Question {n} of {total}",
+    "time_left": "Time left",
+    "next": "Next",
+    "previous": "Previous",
+    "mark_review": "Mark for review",
+    "clear": "Clear answer",
+    "palette": "Answer sheet",
+    "answered": "Answered",
+    "not_visited": "Not visited",
+    "marked": "Marked for review",
+    "submit": "Submit",
+    "submit_confirm": "Submit now? {n} questions are unanswered.",
+    "auto_submit": "Time's up. Your answers have been submitted.",
+    "odia_soon": "Odia coming soon",
+    "pyq_chip": "PYQ {year}",
+    "option_label": "Option {letter}",
+    "option_selected": "Option {letter}, selected",
+    "english_prevails": "If the meaning differs, the English version applies."
+  },
+  "result": {
+    "score": "Your score",
+    "accuracy": "Accuracy",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "skipped": "Skipped",
+    "time": "Time taken",
+    "cutoff": "Last year's cut-off: {marks}",
+    "qualified": "Qualified (66 or more)",
+    "not_qualified": "Not yet qualified (needs 66)",
+    "near_level": "{got}/{total}. Two away from {level}!",
+    "review": "Review answers",
+    "by_topic": "By topic",
+    "share": "Share result",
+    "xp_earned": "+{n} XP"
+  },
+  "review": {
+    "explanation": "Explanation",
+    "your_answer": "Your answer",
+    "right_answer": "Correct answer",
+    "bookmark": "Bookmark",
+    "unofficial_key": "Answer key prepared by Bubbl. OPSC's official key isn't available."
+  },
+  "report": {
+    "title": "Report an error",
+    "wrong_answer": "Wrong answer",
+    "wrong_translation": "Wrong translation",
+    "typo": "Typing mistake",
+    "outdated": "Out of date",
+    "other": "Other",
+    "note": "Add a note (optional)",
+    "send": "Send report",
+    "thanks": "Thanks. We'll check this question."
+  },
+  "plan": {
+    "free": "Free",
+    "pro": "Bubbl Pro",
+    "price": "₹{price} for 12 months"
+  },
+  "paywall": {
+    "title": "Continue with Pro",
+    "medium": "Medium unlocked! Continue with Pro.",
+    "mock": "You've used this month's free mock.",
+    "pyq": "All past papers are free.",
+    "b_levels": "Medium and Hard in every subject",
+    "b_mocks": "Unlimited full mocks",
+    "b_weak": "Weak-topic practice and revision",
+    "b_stats": "Detailed analysis",
+    "b_freeze": "One streak freeze a week",
+    "buy": "Get Pro",
+    "later": "Not now",
+    "restore": "Restore purchase",
+    "active": "Pro is active until {date}",
+    "failed": "Payment didn't go through. You haven't been charged twice."
+  },
+  "game": {
+    "title": "Title",
+    "badges": "Badges",
+    "streak_freeze_used": "Streak freeze used. Your streak is safe.",
+    "streak_lost": "Streak ended. Start a new one today."
+  },
+  "title": {
+    "aspirant": "Aspirant",
+    "prelims_ready": "Prelims Ready",
+    "mains_ready": "Mains Ready",
+    "interview_ready": "Interview Ready",
+    "collector_saheb": "Collector Saheb"
+  },
+  "badge": {
+    "first_bubble": "First Bubble",
+    "daily_dose": "Daily Dose",
+    "iron_habit": "Iron Habit",
+    "mock_master": "Mock Master",
+    "time_traveller": "Time Traveller",
+    "odisha_gyani": "Odisha Gyani",
+    "subject_topper": "Subject Topper",
+    "bug_hunter": "Bug Hunter",
+    "night_owl": "Night Owl"
+  },
+  "board": {
+    "title": "This week's leaderboard",
+    "all_odisha": "All Odisha",
+    "my_batch": "My batch",
+    "you": "You",
+    "resets": "Resets every Monday"
+  },
+  "share": {
+    "card_quiz": "Today's OCS quiz",
+    "card_beat": "Can you beat me?",
+    "code": "Code: {code}"
+  },
+  "notify": {
+    "streak_title": "Your streak is waiting",
+    "streak_body": "Answer 10 questions before midnight to keep it going."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Appearance",
+    "reminder": "Daily reminder",
+    "hide_board": "Hide me from leaderboards",
+    "delete": "Delete my account",
+    "delete_confirm": "This deletes your account and progress for good.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "refund": "Refund policy",
+    "contact": "Contact us"
+  },
+  "centre": {
+    "join": "Join with a centre code",
+    "code": "Centre code",
+    "full": "This centre has no seats left. Please ask your centre.",
+    "joined": "You've joined {centre}"
+  },
+  "empty": {
+    "bookmarks": "No bookmarks yet. Tap the bookmark on any question.",
+    "history": "Your attempts will show here.",
+    "weak": "No weak topics yet. Keep practising."
+  }
+}
