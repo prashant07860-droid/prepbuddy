@@ -1,0 +1,224 @@
+[
+  {
+    "key": "current_affairs",
+    "bank": "gs",
+    "name": {
+      "en": "Current Affairs",
+      "or": "ସାମ୍ପ୍ରତିକ ଘଟଣାବଳୀ"
+    },
+    "icon": "newspaper",
+    "color": "#2747C6",
+    "order": 1,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "history_india",
+    "bank": "gs",
+    "name": {
+      "en": "History of India & National Movement",
+      "or": "ଭାରତ ଇତିହାସ ଓ ଜାତୀୟ ଆନ୍ଦୋଳନ"
+    },
+    "icon": "landmark",
+    "color": "#B4531F",
+    "order": 2,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "history_odisha",
+    "bank": "gs",
+    "name": {
+      "en": "History of Odisha & Odia Nationalism",
+      "or": "ଓଡ଼ିଶା ଇତିହାସ ଓ ଓଡ଼ିଆ ଜାତୀୟତା"
+    },
+    "icon": "temple",
+    "color": "#9A3B6B",
+    "order": 3,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "geography",
+    "bank": "gs",
+    "name": {
+      "en": "Geography (Odisha, India, World)",
+      "or": "ଭୂଗୋଳ (ଓଡ଼ିଶା, ଭାରତ, ବିଶ୍ୱ)"
+    },
+    "icon": "globe",
+    "color": "#0F7C8A",
+    "order": 4,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "polity",
+    "bank": "gs",
+    "name": {
+      "en": "Polity & Governance",
+      "or": "ରାଜନୀତି ଓ ଶାସନ"
+    },
+    "icon": "scale",
+    "color": "#1E4D3B",
+    "order": 5,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "public_policy",
+    "bank": "gs",
+    "name": {
+      "en": "Public Policy & Rights",
+      "or": "ସାର୍ବଜନୀନ ନୀତି ଓ ଅଧିକାର"
+    },
+    "icon": "file-text",
+    "color": "#5B4BB5",
+    "order": 6,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "economy",
+    "bank": "gs",
+    "name": {
+      "en": "Economic & Social Development",
+      "or": "ଆର୍ଥିକ ଓ ସାମାଜିକ ବିକାଶ"
+    },
+    "icon": "trending-up",
+    "color": "#2F7D32",
+    "order": 7,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "environment",
+    "bank": "gs",
+    "name": {
+      "en": "Environment, Ecology & Climate",
+      "or": "ପରିବେଶ, ପାରିସ୍ଥିତିକୀ ଓ ଜଳବାୟୁ"
+    },
+    "icon": "leaf",
+    "color": "#3F8F4F",
+    "order": 8,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "science",
+    "bank": "gs",
+    "name": {
+      "en": "General Science",
+      "or": "ସାଧାରଣ ବିଜ୍ଞାନ"
+    },
+    "icon": "flask",
+    "color": "#C0562A",
+    "order": 9,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "comprehension",
+    "bank": "csat",
+    "name": {
+      "en": "Comprehension",
+      "or": "ବୋଧଗମ୍ୟତା"
+    },
+    "icon": "book-open",
+    "color": "#2747C6",
+    "order": 10,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "interpersonal",
+    "bank": "csat",
+    "name": {
+      "en": "Interpersonal & Communication Skills",
+      "or": "ଆନ୍ତଃବ୍ୟକ୍ତିକ ଓ ଯୋଗାଯୋଗ ଦକ୍ଷତା"
+    },
+    "icon": "users",
+    "color": "#9A3B6B",
+    "order": 11,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "reasoning",
+    "bank": "csat",
+    "name": {
+      "en": "Logical Reasoning & Analytical Ability",
+      "or": "ତାର୍କିକ ଚିନ୍ତନ ଓ ବିଶ୍ଳେଷଣ କ୍ଷମତା"
+    },
+    "icon": "puzzle",
+    "color": "#5B4BB5",
+    "order": 12,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "decision_making",
+    "bank": "csat",
+    "name": {
+      "en": "Decision Making & Problem Solving",
+      "or": "ନିଷ୍ପତ୍ତି ଗ୍ରହଣ ଓ ସମସ୍ୟା ସମାଧାନ"
+    },
+    "icon": "signpost",
+    "color": "#B4531F",
+    "order": 13,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "mental_ability",
+    "bank": "csat",
+    "name": {
+      "en": "General Mental Ability",
+      "or": "ସାଧାରଣ ମାନସିକ ଦକ୍ଷତା"
+    },
+    "icon": "brain",
+    "color": "#0F7C8A",
+    "order": 14,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "numeracy_di",
+    "bank": "csat",
+    "name": {
+      "en": "Basic Numeracy & Data Interpretation",
+      "or": "ମୌଳିକ ଗଣିତ ଓ ତଥ୍ୟ ବିଶ୍ଳେଷଣ"
+    },
+    "icon": "calculator",
+    "color": "#2F7D32",
+    "order": 15,
+    "exams": [
+      "ocs"
+    ]
+  },
+  {
+    "key": "agriculture",
+    "bank": "extra",
+    "name": {
+      "en": "Agriculture",
+      "or": "କୃଷି"
+    },
+    "icon": "sprout",
+    "color": "#6B8E23",
+    "order": 16,
+    "exams": []
+  }
+]

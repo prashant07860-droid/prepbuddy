@@ -1,0 +1,28 @@
+{
+  "pro_price_inr": 149,
+  "pro_months": 12,
+  "free_limits": {
+    "mocks_per_paper_per_month": 1,
+    "pyq_all_free": true,
+    "levels": [
+      "easy"
+    ]
+  },
+  "streak_min_answers": 10,
+  "auto_pause_wrong_answer_reports": 3,
+  "auto_publish": "immediate",
+  "referral": {
+    "referrer_months": 1,
+    "referrer_max_months_per_year": 6,
+    "friend_discount_inr": 20
+  },
+  "gst_enabled": false,
+  "cutoff_reference": {
+    "I": null
+  },
+  "flags": {
+    "leaderboard": true,
+    "odia": true,
+    "centre_tests": false
+  }
+}

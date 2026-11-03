@@ -1,0 +1,677 @@
+[
+  {
+    "key": "national",
+    "subject_key": "current_affairs",
+    "name": {
+      "en": "National events",
+      "or": "ଜାତୀୟ ଘଟଣା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "international",
+    "subject_key": "current_affairs",
+    "name": {
+      "en": "International events",
+      "or": "ଆନ୍ତର୍ଜାତିକ ଘଟଣା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odisha",
+    "subject_key": "current_affairs",
+    "name": {
+      "en": "Odisha events",
+      "or": "ଓଡ଼ିଶାର ଘଟଣା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "awards_sports",
+    "subject_key": "current_affairs",
+    "name": {
+      "en": "Awards and sports",
+      "or": "ପୁରସ୍କାର ଓ କ୍ରୀଡ଼ା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "schemes",
+    "subject_key": "current_affairs",
+    "name": {
+      "en": "Government schemes",
+      "or": "ସରକାରୀ ଯୋଜନା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "science_tech",
+    "subject_key": "current_affairs",
+    "name": {
+      "en": "Science and technology",
+      "or": "ବିଜ୍ଞାନ ଓ ପ୍ରଯୁକ୍ତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "ancient",
+    "subject_key": "history_india",
+    "name": {
+      "en": "Ancient India",
+      "or": "ପ୍ରାଚୀନ ଭାରତ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "medieval",
+    "subject_key": "history_india",
+    "name": {
+      "en": "Medieval India",
+      "or": "ମଧ୍ୟଯୁଗୀୟ ଭାରତ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "modern",
+    "subject_key": "history_india",
+    "name": {
+      "en": "Modern India",
+      "or": "ଆଧୁନିକ ଭାରତ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "national_movement",
+    "subject_key": "history_india",
+    "name": {
+      "en": "Indian National Movement",
+      "or": "ଭାରତୀୟ ଜାତୀୟ ଆନ୍ଦୋଳନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "art_culture",
+    "subject_key": "history_india",
+    "name": {
+      "en": "Art and culture",
+      "or": "କଳା ଓ ସଂସ୍କୃତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "ancient_odisha",
+    "subject_key": "history_odisha",
+    "name": {
+      "en": "Ancient Odisha and Kalinga",
+      "or": "ପ୍ରାଚୀନ ଓଡ଼ିଶା ଓ କଳିଙ୍ଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "medieval_odisha",
+    "subject_key": "history_odisha",
+    "name": {
+      "en": "Medieval Odisha",
+      "or": "ମଧ୍ୟଯୁଗୀୟ ଓଡ଼ିଶା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "colonial_odisha",
+    "subject_key": "history_odisha",
+    "name": {
+      "en": "Colonial Odisha and uprisings",
+      "or": "ଔପନିବେଶିକ ଓଡ଼ିଶା ଓ ବିଦ୍ରୋହ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odia_nationalism",
+    "subject_key": "history_odisha",
+    "name": {
+      "en": "Odia nationalism and province formation",
+      "or": "ଓଡ଼ିଆ ଜାତୀୟତା ଓ ପ୍ରଦେଶ ଗଠନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odisha_freedom",
+    "subject_key": "history_odisha",
+    "name": {
+      "en": "Odisha in the freedom struggle",
+      "or": "ସ୍ୱାଧୀନତା ସଂଗ୍ରାମରେ ଓଡ଼ିଶା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odisha_culture",
+    "subject_key": "history_odisha",
+    "name": {
+      "en": "Odisha's art, temples and literature",
+      "or": "ଓଡ଼ିଶାର କଳା, ମନ୍ଦିର ଓ ସାହିତ୍ୟ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "physical_india",
+    "subject_key": "geography",
+    "name": {
+      "en": "Physical geography of India",
+      "or": "ଭାରତର ପ୍ରାକୃତିକ ଭୂଗୋଳ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odisha_geo",
+    "subject_key": "geography",
+    "name": {
+      "en": "Geography of Odisha",
+      "or": "ଓଡ଼ିଶାର ଭୂଗୋଳ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "world_geo",
+    "subject_key": "geography",
+    "name": {
+      "en": "World geography",
+      "or": "ବିଶ୍ୱ ଭୂଗୋଳ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "social_geo",
+    "subject_key": "geography",
+    "name": {
+      "en": "Social geography",
+      "or": "ସାମାଜିକ ଭୂଗୋଳ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "economic_geo",
+    "subject_key": "geography",
+    "name": {
+      "en": "Economic geography and resources",
+      "or": "ଅର୍ଥନୈତିକ ଭୂଗୋଳ ଓ ସମ୍ପଦ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "climate_rivers",
+    "subject_key": "geography",
+    "name": {
+      "en": "Climate, rivers and soils",
+      "or": "ଜଳବାୟୁ, ନଦୀ ଓ ମୃତ୍ତିକା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "constitution",
+    "subject_key": "polity",
+    "name": {
+      "en": "Constitution: making and features",
+      "or": "ସମ୍ବିଧାନ: ପ୍ରଣୟନ ଓ ବୈଶିଷ୍ଟ୍ୟ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "fundamental_rights",
+    "subject_key": "polity",
+    "name": {
+      "en": "Fundamental Rights and Duties",
+      "or": "ମୌଳିକ ଅଧିକାର ଓ କର୍ତ୍ତବ୍ୟ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "union_govt",
+    "subject_key": "polity",
+    "name": {
+      "en": "Union government and Parliament",
+      "or": "କେନ୍ଦ୍ର ସରକାର ଓ ସଂସଦ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "state_govt",
+    "subject_key": "polity",
+    "name": {
+      "en": "State government",
+      "or": "ରାଜ୍ୟ ସରକାର"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "judiciary",
+    "subject_key": "polity",
+    "name": {
+      "en": "Judiciary",
+      "or": "ନ୍ୟାୟପାଳିକା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "panchayati_raj",
+    "subject_key": "polity",
+    "name": {
+      "en": "Panchayati Raj and local bodies",
+      "or": "ପଞ୍ଚାୟତିରାଜ ଓ ସ୍ଥାନୀୟ ସଂସ୍ଥା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "const_bodies",
+    "subject_key": "polity",
+    "name": {
+      "en": "Constitutional and statutory bodies",
+      "or": "ସାମ୍ବିଧାନିକ ଓ ବିଧିବଦ୍ଧ ସଂସ୍ଥା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "welfare_policy",
+    "subject_key": "public_policy",
+    "name": {
+      "en": "Welfare policy",
+      "or": "କଲ୍ୟାଣ ନୀତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "rights_issues",
+    "subject_key": "public_policy",
+    "name": {
+      "en": "Rights issues",
+      "or": "ଅଧିକାର ସମ୍ବନ୍ଧୀୟ ପ୍ରସଙ୍ଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "rti_governance",
+    "subject_key": "public_policy",
+    "name": {
+      "en": "RTI and good governance",
+      "or": "ସୂଚନା ଅଧିକାର ଓ ସୁଶାସନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "vulnerable_groups",
+    "subject_key": "public_policy",
+    "name": {
+      "en": "Women, children and vulnerable groups",
+      "or": "ମହିଳା, ଶିଶୁ ଓ ଦୁର୍ବଳ ବର୍ଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "basics_planning",
+    "subject_key": "economy",
+    "name": {
+      "en": "Basics and planning",
+      "or": "ମୌଳିକ ଧାରଣା ଓ ଯୋଜନା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "poverty_inclusion",
+    "subject_key": "economy",
+    "name": {
+      "en": "Poverty and inclusion",
+      "or": "ଦାରିଦ୍ର୍ୟ ଓ ଅନ୍ତର୍ଭୁକ୍ତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "demographics",
+    "subject_key": "economy",
+    "name": {
+      "en": "Demographics",
+      "or": "ଜନସଂଖ୍ୟା ତତ୍ତ୍ୱ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "social_sector",
+    "subject_key": "economy",
+    "name": {
+      "en": "Social sector initiatives",
+      "or": "ସାମାଜିକ କ୍ଷେତ୍ର ପଦକ୍ଷେପ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "sustainable_dev",
+    "subject_key": "economy",
+    "name": {
+      "en": "Sustainable development",
+      "or": "ସ୍ଥାୟୀ ବିକାଶ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "banking_budget",
+    "subject_key": "economy",
+    "name": {
+      "en": "Banking and budget",
+      "or": "ବ୍ୟାଙ୍କିଂ ଓ ବଜେଟ୍"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odisha_economy",
+    "subject_key": "economy",
+    "name": {
+      "en": "Odisha's economy",
+      "or": "ଓଡ଼ିଶାର ଅର୍ଥନୀତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "ecology_basics",
+    "subject_key": "environment",
+    "name": {
+      "en": "Ecology basics",
+      "or": "ପାରିସ୍ଥିତିକୀର ମୌଳିକ ଧାରଣା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "biodiversity",
+    "subject_key": "environment",
+    "name": {
+      "en": "Biodiversity",
+      "or": "ଜୈବ ବିବିଧତା"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "climate_change",
+    "subject_key": "environment",
+    "name": {
+      "en": "Climate change",
+      "or": "ଜଳବାୟୁ ପରିବର୍ତ୍ତନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "pollution",
+    "subject_key": "environment",
+    "name": {
+      "en": "Pollution and conservation",
+      "or": "ପ୍ରଦୂଷଣ ଓ ସଂରକ୍ଷଣ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "env_law",
+    "subject_key": "environment",
+    "name": {
+      "en": "Environment laws and treaties",
+      "or": "ପରିବେଶ ଆଇନ ଓ ଚୁକ୍ତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "protected_areas",
+    "subject_key": "environment",
+    "name": {
+      "en": "Protected areas, including Odisha",
+      "or": "ସଂରକ୍ଷିତ ଅଞ୍ଚଳ (ଓଡ଼ିଶା ସମେତ)"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "physics",
+    "subject_key": "science",
+    "name": {
+      "en": "Physics",
+      "or": "ପଦାର୍ଥ ବିଜ୍ଞାନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "chemistry",
+    "subject_key": "science",
+    "name": {
+      "en": "Chemistry",
+      "or": "ରସାୟନ ବିଜ୍ଞାନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "biology",
+    "subject_key": "science",
+    "name": {
+      "en": "Biology",
+      "or": "ଜୀବ ବିଜ୍ଞାନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "health",
+    "subject_key": "science",
+    "name": {
+      "en": "Health and diseases",
+      "or": "ସ୍ୱାସ୍ଥ୍ୟ ଓ ରୋଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "space_tech",
+    "subject_key": "science",
+    "name": {
+      "en": "Space and technology",
+      "or": "ମହାକାଶ ଓ ପ୍ରଯୁକ୍ତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "passages",
+    "subject_key": "comprehension",
+    "name": {
+      "en": "Reading passages",
+      "or": "ପଠନ ଅନୁଚ୍ଛେଦ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "inference",
+    "subject_key": "comprehension",
+    "name": {
+      "en": "Inference and main idea",
+      "or": "ନିଷ୍କର୍ଷ ଓ ମୁଖ୍ୟ ଭାବ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "communication",
+    "subject_key": "interpersonal",
+    "name": {
+      "en": "Communication",
+      "or": "ଯୋଗାଯୋଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "workplace_situations",
+    "subject_key": "interpersonal",
+    "name": {
+      "en": "Workplace situations",
+      "or": "କର୍ମସ୍ଥଳୀ ପରିସ୍ଥିତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "syllogism",
+    "subject_key": "reasoning",
+    "name": {
+      "en": "Statements and conclusions",
+      "or": "ଉକ୍ତି ଓ ନିଷ୍କର୍ଷ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "arrangements",
+    "subject_key": "reasoning",
+    "name": {
+      "en": "Arrangements and puzzles",
+      "or": "ବ୍ୟବସ୍ଥାପନା ଓ ପଜଲ୍"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "coding",
+    "subject_key": "reasoning",
+    "name": {
+      "en": "Coding and decoding",
+      "or": "କୋଡିଂ ଓ ଡିକୋଡିଂ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "blood_direction",
+    "subject_key": "reasoning",
+    "name": {
+      "en": "Relations and directions",
+      "or": "ସମ୍ପର୍କ ଓ ଦିଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "admin_scenarios",
+    "subject_key": "decision_making",
+    "name": {
+      "en": "Administrative scenarios",
+      "or": "ପ୍ରଶାସନିକ ପରିସ୍ଥିତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "problem_solving",
+    "subject_key": "decision_making",
+    "name": {
+      "en": "Problem solving",
+      "or": "ସମସ୍ୟା ସମାଧାନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "series",
+    "subject_key": "mental_ability",
+    "name": {
+      "en": "Number and letter series",
+      "or": "ସଂଖ୍ୟା ଓ ଅକ୍ଷର ଶ୍ରେଣୀ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "analogy",
+    "subject_key": "mental_ability",
+    "name": {
+      "en": "Analogy and classification",
+      "or": "ସାଦୃଶ୍ୟ ଓ ବର୍ଗୀକରଣ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "figures",
+    "subject_key": "mental_ability",
+    "name": {
+      "en": "Figures and patterns",
+      "or": "ଚିତ୍ର ଓ ପ୍ୟାଟର୍ନ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "calendar_clock",
+    "subject_key": "mental_ability",
+    "name": {
+      "en": "Calendar and clock",
+      "or": "କ୍ୟାଲେଣ୍ଡର ଓ ଘଡ଼ି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "arithmetic",
+    "subject_key": "numeracy_di",
+    "name": {
+      "en": "Arithmetic",
+      "or": "ପାଟୀଗଣିତ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "percent_ratio",
+    "subject_key": "numeracy_di",
+    "name": {
+      "en": "Percentages and ratios",
+      "or": "ଶତକଡ଼ା ଓ ଅନୁପାତ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "time_work",
+    "subject_key": "numeracy_di",
+    "name": {
+      "en": "Time, work and speed",
+      "or": "ସମୟ, କାର୍ଯ୍ୟ ଓ ବେଗ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "data_interpretation",
+    "subject_key": "numeracy_di",
+    "name": {
+      "en": "Data interpretation",
+      "or": "ତଥ୍ୟ ବିଶ୍ଳେଷଣ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "geometry_mensuration",
+    "subject_key": "numeracy_di",
+    "name": {
+      "en": "Geometry and measurement",
+      "or": "ଜ୍ୟାମିତି ଓ ପରିମିତି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "crops",
+    "subject_key": "agriculture",
+    "name": {
+      "en": "Crops",
+      "or": "ଫସଲ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "soils_water",
+    "subject_key": "agriculture",
+    "name": {
+      "en": "Soils and water",
+      "or": "ମୃତ୍ତିକା ଓ ଜଳ"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "odisha_agri",
+    "subject_key": "agriculture",
+    "name": {
+      "en": "Agriculture in Odisha",
+      "or": "ଓଡ଼ିଶାରେ କୃଷି"
+    },
+    "parent_key": null
+  },
+  {
+    "key": "agri_schemes",
+    "subject_key": "agriculture",
+    "name": {
+      "en": "Agriculture schemes",
+      "or": "କୃଷି ଯୋଜନା"
+    },
+    "parent_key": null
+  }
+]

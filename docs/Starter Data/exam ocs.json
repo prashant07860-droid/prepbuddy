@@ -1,0 +1,58 @@
+{
+  "key": "ocs",
+  "name": {
+    "en": "Odisha Civil Services (Prelims)",
+    "or": "ଓଡ଼ିଶା ସିଭିଲ୍ ସର୍ଭିସେସ୍ (ପ୍ରାରମ୍ଭିକ)"
+  },
+  "active": true,
+  "papers": [
+    {
+      "key": "I",
+      "name": "General Studies",
+      "bank": "gs",
+      "questions": 100,
+      "marks_per_question": 2,
+      "duration_min": 120,
+      "negative_fraction": "1/3",
+      "qualifying_marks": null,
+      "counts_for_merit": true,
+      "blueprint_status": "provisional until the past-paper recount",
+      "blueprint": {
+        "current_affairs": 15,
+        "history_india": 12,
+        "history_odisha": 8,
+        "geography": 15,
+        "polity": 14,
+        "public_policy": 4,
+        "economy": 12,
+        "environment": 10,
+        "science": 10
+      }
+    },
+    {
+      "key": "II",
+      "name": "General Studies (CSAT)",
+      "bank": "csat",
+      "questions": 80,
+      "marks_per_question": 2.5,
+      "duration_min": 120,
+      "negative_fraction": "1/3",
+      "qualifying_marks": 66,
+      "counts_for_merit": false,
+      "blueprint_status": "provisional until the past-paper recount",
+      "blueprint": {
+        "comprehension": 20,
+        "interpersonal": 8,
+        "reasoning": 16,
+        "decision_making": 8,
+        "mental_ability": 12,
+        "numeracy_di": 16
+      }
+    }
+  ],
+  "difficulty_mix": {
+    "easy": 25,
+    "medium": 50,
+    "hard": 25
+  }
+}
