@@ -48,4 +48,4 @@ Bubbl is provided as it is. As far as the law allows, we aren't liable for indir
 These terms are governed by the laws of India. Courts in [CITY, STATE] have jurisdiction.
 
 ## Changes and contact
-We'll post changes here and update the date above. Questions: [SUPPORT EMAIL].
+We'll post changes here and update the date above. Questions: ask@zeppmedia.com.

@@ -4,7 +4,7 @@
 
 **In the app:** go to Settings → Delete my account → confirm. It takes effect straight away.
 
-**Without the app:** email [SUPPORT EMAIL] from your account's email with the subject "Delete my account". We'll finish within 7 days.
+**Without the app:** email ask@zeppmedia.com from your account's email with the subject "Delete my account". We'll finish within 7 days.
 
 **What's deleted:** your name, email, phone, password, attempts, scores, streaks, bookmarks and leaderboard entries.
 

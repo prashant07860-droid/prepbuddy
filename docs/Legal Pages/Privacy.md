@@ -44,7 +44,7 @@ You can:
 - withdraw consent or [delete your account](/delete-account)
 - raise a complaint with us, and then with the Data Protection Board of India
 
-**Grievance contact:** [NAME], [SUPPORT EMAIL]. We aim to reply within 7 days.
+**Grievance contact:** [NAME], ask@zeppmedia.com. We aim to reply within 7 days.
 
 ## Age
 Bubbl is for people aged 18 and over. If you believe a child has signed up, contact us and we'll delete the account.

@@ -4,7 +4,7 @@
 
 **Bubbl** is run by Prashant Rana, an individual based in India.
 
-- **Email:** [SUPPORT EMAIL]
+- **Email:** ask@zeppmedia.com
 - **Phone:** [PHONE NUMBER]
 - **Address:** [FULL POSTAL ADDRESS IN INDIA]
 - **Hours:** [e.g. Mon–Sat, 10 am – 6 pm IST]
