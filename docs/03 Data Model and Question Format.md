@@ -42,6 +42,7 @@ Each subject has **topics** (and optional subtopics). Topics are data in the `to
 | `subjects` | Subject list | `key`, `bank` (`gs`/`csat`/`extra`), `name{en,or}`, `icon`, `color`, `order`, `exams[]` |
 | `topics` | Topics per subject | `key`, `subject_key`, `name{en,or}`, `parent_key?` |
 | `questions` | The bank (see §3) | |
+| `passages` | Shared text for comprehension sets | `id` (matches `passage_id`), `text{en,or}` |
 | `pyq_papers` | Fixed past papers | `exam`, `year`, `paper` (`I`/`II`), `question_ids[]` in exam order, `duration_min`, `marking` |
 | `attempts` | One practice session / mock | `user_id`, `mode`, `exam`, `paper?`, `subject?`, `level?`, `items[] {question_id, version, option_order[], answer?, time_ms, marked}`, `score`, `started_at`, `submitted_at` |
 | `seen` | Per-user seen-question index | `user_id`, `question_id`, `last_seen_at`, `times`, `last_correct` |
@@ -57,6 +58,7 @@ Each subject has **topics** (and optional subtopics). Topics are data in the `to
 | `batches` | Groups inside a centre | `centre_id`, `name`, `join_code`, `assigned_tests[]` |
 | `reports` | Student error reports | `question_id`, `user_id`, `reason`, `note`, `status` (`open`/`fixed`/`dismissed`), `resolved_by` |
 | `marketing_items` | Marketing review queue | see `05` §4 |
+| `waitlist` | Pre-launch sign-ups | `name`, `email` (unique), `phone?`, `consent_at`, `source` |
 | `events` | Analytics events | `user_id?`, `name`, `props`, `ts` |
 | `settings` | Admin-editable config | prices, free limits, cut-off marks, feature flags, blueprint weights |
 | `api_keys` | Automation keys | `name`, `hash`, `scopes[]`, `created_at`, `last_used_at`, `revoked` |
@@ -81,12 +83,15 @@ Each subject has **topics** (and optional subtopics). Topics are data in the `to
   "correct": 2,                      // 0-3, index into options BEFORE any runtime shuffle
   "shuffle_ok": true,                // false when options refer to each other ("Both A and B", "All of the above") or are ordered (1 only / 1 and 2 only …)
   "explanation": { "en": "...", "or": "..." },
-  "source": { "kind": "generated", "exam": null, "year": null, "paper": null, "qno": null },
+  "figure": null,                    // or { "url": "https://...", "alt": "..." } when the question needs a picture
+  "source": { "kind": "generated", "exam": null, "year": null, "paper": null, "qno": null, "key_source": "bubbl" },
                                      // kind: generated | pyq | legacy | manual
+                                     // key_source: official | bubbl. When a PYQ's is "bubbl", review shows the unofficial-key notice
   "status": "pending",               // pending | approved | fix | rejected | live | paused
   "review": {
     "checks": { "duplicate_of": null, "ai_agree": true, "ai_answer": 2, "flags": [] },
-                                     // flags e.g. ["ai_disagrees","near_duplicate","odisha_fact","date_sensitive","translation_low_conf"]
+                                     // flags: ai_disagrees, near_duplicate, odisha_fact, date_sensitive, translation_low_conf,
+                                     // english_odia_mismatch, topic_guess, has_figure
     "note": null,                    // owner's note when status = fix
     "decided_by": null, "decided_at": null
   },
@@ -98,8 +103,11 @@ Each subject has **topics** (and optional subtopics). Topics are data in the `to
 ```
 
 Rules:
-- `text.or`, `options.or` and `explanation.or` may be empty at import; the UI falls back to English and shows a small "Odia coming soon" tag.
-- `options.en` and `options.or` must have the same length (4).
+- `text.or`, `options.or` and `explanation.or` may be empty at import; the UI falls back to English and shows a small "Odia coming soon" tag. Launch ships with English explanations only (decided 3 Nov); question pictures and app text are still in Odia where available.
+- `options.en` and `options.or` must have the same length (4), except for picture-based PYQs, whose `options` are empty.
+- Question text and options are plain text with `\n` line breaks. Render line breaks as written; match lists arrive as plain lines.
+- A question may be `live` only if `correct` is 0–3 and any `figure` has a working URL. Text must never be auto-corrected.
+- A question with `passage_id` must have a matching `passages` document. Serve the passage above each question in the set.
 - Editing text/options/correct/explanation increments `version`; attempts keep the version they used.
 - **Status workflow:**
   - `pending` → owner decides `approved` / `fix` / `rejected`
@@ -111,12 +119,17 @@ Rules:
 
 ## 4. PYQ (previous-year) questions
 - Stored as normal questions with `source.kind = "pyq"`, `source.exam = "ocs"`, `source.year`, `source.paper`, `source.qno`.
+- **Shown as pictures from the original paper, not typed text.** They carry `image: { "en": "<url>", "or": "<url or null>" }`, plus `passage_image` when a set shares a passage. `text` and `options` stay empty. The picture includes the options, so the app shows it above four OMR bubbles labelled A–D. Pictures are WebP, about 50 KB each; load only the student's language. Older papers (2015–2021) have English pictures only. A few printed questions have only three options, so store `option_count` (default 4) and show that many bubbles.
+- `correct`, subject, topic, difficulty and our own `explanation` are stored as usual.
+- **Official keys:** OPSC accepted more than one option on some questions. Store the first in `correct` and the others in `also_correct` (for example `[2]`); a student choosing any of them scores as correct. Questions OPSC dropped ("Not Valued") are never made `live`. Questions whose answer file says `release: hold` or `release: dropped` are not imported for launch. `source.key_source` is `official` when the answer comes from OPSC's key, and `bubbl` otherwise (all of 2018, where no key was found).
 - A `pyq_papers` document holds the fixed order. PYQ papers are served in their original order and are **never** shuffled.
 - PYQ questions are also eligible for practice sets, marked with a "PYQ 2023" chip.
-- Official OCS papers are bilingual (English + Odia), so Odia text comes from the paper itself.
+- OCS papers from 2022 to 2025 are bilingual; earlier ones are in English only.
 
 ## 5. Import format
-- Import accepts a JSON array of question objects in the §3 shape, minus server fields (`id`, `stats`, `version`, timestamps).
+- Import accepts `{ "passages": [...], "items": [...] }` or a plain array of question objects in the §3 shape, minus server fields (`id`, `stats`, `version`, timestamps).
+- Extra fields inside `source` (for example `booklet`, `page`) are kept.
 - Validation errors are returned per item; valid items are inserted, invalid ones rejected with reasons.
 - An `ext_id` that already exists is an update when its status is `fix`, and skipped otherwise.
-- See `sample questions.json` for three valid examples.
+- See `sample questions.json` for valid examples, including a passage and a figure.
+- `Starter Data/` holds the subjects, topics, OCS exam settings and default settings to load in E4.

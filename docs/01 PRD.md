@@ -1,8 +1,8 @@
 # Bubbl — Product Requirements Document (Phase 1)
 
-**Version:** 1.0 · **Date:** 1 Nov 2026 · **Owner:** Prashant Rana
+**Version:** 2.0 (two projects) · **Date:** 1 Nov 2026 · **Owner:** Prashant Rana
 **Product:** Bubbl — exam practice app for Indian competitive exams (launch exam: OPSC Odisha Civil Services, OCS)
-**Codebase starting point:** this GitHub repo (previously "Preppbuddy"; an Expo + FastAPI + MongoDB app). Read `02 Current State Audit.md` before changing anything.
+**Codebase starting point:** this GitHub repo (previously "Preppbuddy"; an Expo + FastAPI + MongoDB app). Read `02 Current State Audit.md` before changing anything. **Bubbl is built as two Emergent projects; see `09 Two Project Setup.md`.**
 
 ---
 
@@ -22,11 +22,11 @@ Bubbl turns that into a habit-forming app: short daily practice, levels, streaks
 
 | Goal | Measure |
 |---|---|
-| Launch OCS practice before the OCS 2026 notification (expected around Dec 2026 to Jan 2027) | Live on Play Store + web by **5 Jan 2027** |
+| Launch OCS practice before the OCS 2026 notification (expected around Dec 2026 to Jan 2027) | Live on Play Store + website by **5 Jan 2027** |
 | Students build a daily habit | 30% of new users on a 3-day streak or longer in week 1 |
 | Content can be trusted | Fewer than 1 confirmed error report per 500 questions served |
 | Turn free users into paying users | 3–5% of active users upgrade to Pro by the prelims |
-| Coaching centres | 5 paid centre licences by March 2027 |
+| Coaching centres | 5 paid centre licences by March 2027 (dashboard ships after launch) |
 | Owner effort | Running the product takes Prashant at most 5–10 hrs/week, all from the Admin Command Center |
 
 ## 3. Users
@@ -45,11 +45,11 @@ Bubbl turns that into a habit-forming app: short daily practice, levels, streaks
 4. **Bilingual content:** each question has English and Odia text, and students can switch language per question or set a default.
 5. **Results and review:** score with negative marking, time per question, topic breakdown, explanations, and a "Report an error" button on every question.
 6. **Accounts:** email + password, Google sign-in, guest mode (guest progress moves over when they sign up), and real password reset by email.
-7. **Plans and payments:** free tier, Bubbl Pro (₹149), and coaching-centre licences. Razorpay on web, Google Play Billing on Android. See `06`.
-8. **Admin Command Center (web)** for the owner: review queues, content, reports, users, sales, centres, marketing queue and settings. See `05`.
+7. **Plans and payments:** free tier and Bubbl Pro (₹149). Razorpay on the website, Google Play Billing on Android. See `06`.
+8. **Admin Command Center (in Bubbl Web)** for the owner: review queues, content, reports, users, sales and settings. See `05`.
 9. **Admin Automation API** so external automations can push pending content and read decisions. See `05`.
-10. **Landing website + legal pages + SEO pages** for previous-year papers (web build of the same app).
-11. **Android release** on Google Play. The web app works on iPhone browsers; a native iOS app is out of scope for Phase 1.
+10. **Landing website + legal pages + SEO pages** for previous-year papers, plus web login and checkout (all in Bubbl Web).
+11. **Android release** on Google Play.
 
 ### 4.2 Out of scope (Phase 1)
 - Writing questions inside Emergent. **All question content arrives through the import API or a JSON file.** Do not generate questions in code or ask the agent to write question files.
@@ -57,6 +57,8 @@ Bubbl turns that into a habit-forming app: short daily practice, levels, streaks
 - Mains (descriptive) answer writing.
 - UPSC / other state exam modules. The design must allow them, but they ship in Phase 2.
 - Native iOS app.
+- **Student practice in a web browser** (iPhone users wait; decided 1 Nov 2026, may follow after launch).
+- **Until after launch:** Centre Dashboard, centre tests, batch leaderboard, Coupons screen, Marketing Queue screen. Early centres get free Pro through 100%-off codes created with the admin API.
 
 ## 5. Key user journeys
 
@@ -65,9 +67,9 @@ Bubbl turns that into a habit-forming app: short daily practice, levels, streaks
 3. **Level up:** finish Easy sets in Polity → Medium unlocks. **Medium and Hard are Pro**, so the unlock moment is the main upgrade prompt.
 4. **Full mock:** OCS Paper I simulation (100 Q, 2 hrs, +2 / −0.66) with an OMR-style answer panel → result with estimated score, cut-off comparison (admin-configurable) and topic breakdown.
 5. **PYQ:** pick year 2015–2025 → take the paper as it was set (fixed order), English/Odia → review with explanations.
-6. **Report an error:** on any question → choose reason (wrong answer / wrong translation / typo / outdated / other) + optional note → it goes to the admin Reports queue.
+6. **Report an error:** on any question → choose reason (wrong answer / explanation doesn't help / wrong translation / typo / outdated / other) + optional note → it goes to the admin Reports queue.
 7. **Upgrade:** paywall sheet → Razorpay (web) or Play Billing (Android) → Pro active straight away on every device.
-8. **Coaching student:** enters a centre code → joins the batch → gets Pro for as long as the centre licence lasts → sees centre-assigned tests and the batch leaderboard.
+8. **Coaching student (at launch):** enters a code from their centre → gets Pro for the code's period. Batches and centre tests come after launch.
 9. **Owner weekly loop:** opens Command Center → approves/fixes flagged questions → clears reports → approves marketing items → checks KPIs.
 
 ## 6. Functional requirements (summary — details in docs 03–06)
@@ -83,7 +85,7 @@ Bubbl turns that into a habit-forming app: short daily practice, levels, streaks
 | F7 | Report-an-error flow; questions auto-pause on a report threshold | 04, 05 |
 | F8 | Free vs Pro limits enforced on the **server** | 06 |
 | F9 | Payments: Razorpay (web) + Play Billing (Android) giving the same server-side entitlement | 06 |
-| F10 | Coaching centres: licences, seats, batches, join codes, assigned tests, batch dashboard | 06 |
+| F10 | Coaching centres: licences, seats, batches, join codes, assigned tests, batch dashboard (**after launch**) | 06 |
 | F11 | Admin Command Center with review queues and KPIs | 05 |
 | F12 | Admin Automation API with scoped API keys and an audit log | 05 |
 | F13 | Bilingual UI (English + Odia) for all student-facing strings | 07 |
@@ -109,9 +111,9 @@ OPSC's own recruitment calendar shows the OCS 2025 cycle as: advertisement 31 De
 
 | Window | What happens |
 |---|---|
-| 1–7 Nov 2026 | Docs signed off; Emergent M1; question pipeline built; brand assets |
-| 8 Nov – 20 Dec 2026 | Emergent M2–M6 (about one milestone a week); content pipeline fills subjects; **pre-launch noise starts** (Telegram, Instagram, waitlist) |
-| 20–31 Dec 2026 | Closed beta: the friend's circle plus 50–100 waitlist users, free |
+| 1–7 Nov 2026 | Docs and assets final; Bubbl Mobile E1–E2; question pipeline piloted |
+| 8 Nov – 20 Dec 2026 | Bubbl Mobile E3–E13 and Bubbl Web W1–W5 (see `08`); content pipeline fills subjects; **pre-launch noise starts** (Telegram, Instagram, waitlist) |
+| 10–29 Dec 2026 | Google Play closed test: 12+ testers for 14 days, free |
 | **~5 Jan 2027** | Public launch on Play Store + web, Pro on sale at the launch price |
 | Jan–May 2027 | Peak season: daily content, mock-test weekends, coaching outreach |
 | ~June 2027 | OCS prelims → review results, then start Phase 2 (UPSC + other states) |
@@ -131,7 +133,7 @@ OPSC's own recruitment calendar shows the OCS 2025 cycle as: advertisement 31 De
 ## 11. Document map
 | File | Purpose |
 |---|---|
-| `00 Emergent Kickoff Prompt.md` | What to paste into Emergent first |
+| `00 Kickoff Prompts.md` | What to paste into each Emergent project first |
 | `01 PRD.md` | This document |
 | `02 Current State Audit.md` | What exists in the repo and what is broken |
 | `03 Data Model and Question Format.md` | Collections, question JSON, statuses; sample in `sample questions.json` |
@@ -139,4 +141,5 @@ OPSC's own recruitment calendar shows the OCS 2025 cycle as: advertisement 31 De
 | `05 Admin Command Center and Automation API.md` | Dashboard screens, review workflow, API endpoints |
 | `06 Plans, Payments and Coaching Centres.md` | Free vs Pro, prices, Razorpay, Play Billing, centre licences |
 | `07 Brand and UI Guide.md` | Name, colours, fonts, logo, tone, Odia |
-| `08 Milestones and Acceptance Tests.md` | Build order M1–M6 with done-checks |
+| `08 Milestones and Acceptance Tests.md` | Build order E1–E13 (mobile), W1–W5 (web), with done-checks |
+| `09 Two Project Setup.md` | What each Emergent project owns, and platform limits |

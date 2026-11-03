@@ -17,7 +17,7 @@ Read this before changing code. It records what exists, what is broken, and what
 | Polity, `questions_polity_part1..22.py` | 1,386 (14 duplicate texts) | **No — not wired in** |
 | 10 other subjects, one file each | 35–82 each | Yes, recycled to fill 2,600 slots |
 
-## 2. Defects to fix (all in Milestone M1)
+## 2. Defects to fix (see `08` for which milestone)
 
 | # | Defect | Where | Fix |
 |---|---|---|---|
@@ -40,7 +40,7 @@ Read this before changing code. It records what exists, what is broken, and what
 - Guest mode and guest → account conversion (`/auth/guest/convert`).
 - The FastAPI + MongoDB + Expo stack. No stack change.
 
-## 4. One-time content migration (M1)
+## 4. One-time content migration (E4)
 1. Export the existing Agriculture and Polity banks to the JSON format in `03` using a one-off script in `backend/scripts/migrate_legacy.py`.
 2. Import them with `status: "pending"` and `source.kind: "legacy"`. **Do not mark them live.** They go through the same automated checks and owner review as new content (via the Command Center).
 3. The other 10 small single-file banks: import as `pending` too. The question pipeline will add to them.

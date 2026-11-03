@@ -12,10 +12,10 @@ There are **no pre-built "Paper 1…100" documents.** Every attempt is assembled
 | **Level Test** | 25 Q | 30 min | exam marking | Subject + level; used to unlock the next level | Easy test Free · others Pro |
 | **Full Mock — Paper I** | 100 Q | 120 min | +2 / −0.66 | OCS Paper I blueprint (§3) | 1 per month Free · unlimited Pro |
 | **Full Mock — Paper II (CSAT)** | 80 Q | 120 min | +2.5 / −0.83 | OCS Paper II blueprint | 1 per month Free · unlimited Pro |
-| **Previous Year Paper** | as set | as set | as set | Fixed paper and order | Latest year Free · all years Pro |
+| **Previous Year Paper** | as set | as set | as set | Fixed paper and order | Free, all years |
 | **Weak-Topic Practice** | 20 Q | optional | practice | Topics with accuracy < 50% over ≥ 10 answered | Pro |
 | **Revision** | up to 30 | optional | practice | Bookmarked + previously wrong | Pro |
-| **Centre Test** | set by centre | set by centre | exam marking | Generated once by the centre admin, then identical for every student in the batch | Centre students |
+| **Centre Test** (after launch) | set by centre | set by centre | exam marking | Generated once by the centre admin, then identical for every student in the batch | Centre students |
 
 All limits come from `settings` so the owner can change them without a release.
 
@@ -61,6 +61,7 @@ Difficulty mix inside a mock: 25% easy / 50% medium / 25% hard (Setting).
   - the full review with explanations, in the student's language
 - Update `seen`, `topic_stats` and `progress`; award XP (§6).
 - Every question in review has **Bookmark** and **Report an error** buttons.
+- A PYQ whose `source.key_source` is `bubbl` shows the `review.unofficial_key` notice.
 
 ## 6. Gamification
 
@@ -103,7 +104,7 @@ Difficulty mix inside a mock: 25% easy / 50% medium / 25% hard (Setting).
 First Bubble (first answer) · Daily Dose (7-day streak) · Iron Habit (30-day streak) · Mock Master (10 full mocks) · Time Traveller (all PYQ papers of 3 different years) · Odisha Gyani (≥ 80% over 200 Odisha-history questions) · Subject Topper (≥ 75% over 100 Hard questions in a subject) · Bug Hunter (first confirmed error report) · Night Owl (mock submitted after 22:00 IST).
 
 ### 6.6 Leaderboards
-- Weekly XP, resets Monday 00:00 IST. Scopes: **All Odisha**, **My batch** (centre students), **Friends** (invite code; Phase 2 if needed).
+- Weekly XP, resets Monday 00:00 IST. Scope at launch: **All Odisha**. **My batch** comes with centres after launch; **Friends** is Phase 2 if needed.
 - Show a display name + title only. Students can hide themselves from leaderboards in Settings.
 
 ### 6.7 Weak topics

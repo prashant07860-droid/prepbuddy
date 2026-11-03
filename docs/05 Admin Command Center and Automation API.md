@@ -5,8 +5,9 @@ The owner runs the whole business from one web dashboard, the **Command Center**
 Every queue uses the same status language: **pending → approved / fix (with a note) / rejected → live (or posted)**.
 
 ## 1. Where it lives
-- Routes under `/admin/*` in the **same Expo project**, used on the web build (desktop layout, min width 1024 px). It needs the `admin` role.
-- Backend routes under `/api/admin/*` (session JWT with the `admin` role) and `/api/admin/v1/*` for automations (API key).
+- Screens are built in **Bubbl Web** (desktop layout, min width 1024 px). They need the `admin` role.
+- All data and logic stay on the **Bubbl Mobile backend**: routes under `/api/admin/*` (session JWT with the `admin` role) and `/api/admin/v1/*` for automations (API key). Bubbl Web has no database of its own. See `09`.
+- **At launch:** screens 1–6, 8, 11, 12. **After launch:** 7 (Marketing Queue), 9 (Coaching Centres), 10 (Coupons).
 
 ## 2. Screens
 
@@ -51,15 +52,16 @@ Auth: header `X-Api-Key: <key>`. Keys are stored hashed and have scopes. Every c
 
 | Method & path | Scope | Purpose |
 |---|---|---|
-| `POST /questions/import` | `questions:write` | Body `{batch_id, items:[question…]}` (max 500 items). Inserts as `pending`; `ext_id` makes it idempotent; an `ext_id` whose current status is `fix` is updated and returns to `pending`. Response: per-item result `{ext_id, id?, result: inserted|updated|skipped|invalid, errors[]}`. |
+| `POST /questions/import` | `questions:write` | Body `{batch_id, passages:[…], items:[question…]}` (max 500 items). Inserts as `pending`; `ext_id` makes it idempotent; an `ext_id` whose current status is `fix` is updated and returns to `pending`. Response: per-item result `{ext_id, id?, result: inserted|updated|skipped|invalid, errors[]}`. |
 | `GET /questions?status=&updated_since=&subject_key=&limit=&cursor=` | `questions:read` | Read decisions (e.g. all `fix` questions with notes, all `rejected` since a time). |
 | `PATCH /questions/{id}` | `questions:write` | Partial update of content fields (new version → `pending`). Cannot set `live`. |
 | `GET /reports?status=open` | `reports:read` | Lets the pipeline pre-check reported questions and suggest fixes. |
 | `POST /reports/{id}/suggestion` | `reports:write` | Attach a suggested correction for the owner to approve. |
-| `POST /marketing/items` | `marketing:write` | Create pending marketing items (max 50). |
-| `GET /marketing/items?status=&updated_since=` | `marketing:read` | Read decisions. |
-| `PATCH /marketing/items/{id}` | `marketing:write` | Set `posted`, `posted_at`, `permalink`, or update content after `fix`. |
-| `POST /media` | `marketing:write` | Upload an image/video (≤ 50 MB) → returns a URL for marketing items. |
+| `POST /coupons` | `coupons:write` | Create a code (`percent_off`, `max_uses`, `valid_until`). Used at launch in place of the Coupons screen. |
+| `POST /marketing/items` | `marketing:write` | Create pending marketing items (max 50). After launch. |
+| `GET /marketing/items?status=&updated_since=` | `marketing:read` | Read decisions. After launch. |
+| `PATCH /marketing/items/{id}` | `marketing:write` | Set `posted`, `posted_at`, `permalink`, or update content after `fix`. After launch. |
+| `POST /media` | `marketing:write` or `questions:write` | Upload an image/video (≤ 50 MB) → returns a URL for marketing items and question figures. |
 | `GET /metrics/summary?from=&to=` | `metrics:read` | KPIs for the weekly business report (users, DAU, purchases, revenue, content coverage, report counts). |
 | `GET /coverage` | `questions:read` | Live/pending counts per subject × topic × difficulty, so the pipeline knows what to generate next. |
 | `GET /settings/blueprints` / `PUT /settings/blueprints` | `settings:write` | Read/update mock blueprints (the PUT is logged and visible in Settings). |

@@ -11,7 +11,7 @@ All prices and limits live in `settings` (editable in the Command Center). The s
 | Easy level, every subject | ✅ unlimited | ✅ |
 | Medium + Hard levels | 🔒 | ✅ |
 | Full mocks (Paper I & II) | 1 of each per calendar month | Unlimited |
-| Previous-year papers | Latest year (2025) | All years 2015–2025 |
+| Previous-year papers | **All years 2015–2025, always free** | All years 2015–2025 |
 | Weak-topic practice, Revision | 🔒 | ✅ |
 | Detailed analytics (topic trends, time analysis) | Basic score only | ✅ |
 | Streak freeze | — | 1 per week |
@@ -19,7 +19,7 @@ All prices and limits live in `settings` (editable in the Command Center). The s
 | Leaderboard, badges, XP | ✅ | ✅ |
 | Ads | None | None |
 
-**Why this split:** the free tier is good enough to build a daily habit and be shared (Daily Quiz, Easy levels, 1 mock/month, latest PYQ). The natural upgrade moments are Medium unlocking, the 2nd mock in a month, and older PYQ years. Each one shows a paywall sheet saying exactly what Pro adds.
+**Why this split:** the free tier is good enough to build a daily habit and be shared (Daily Quiz, Easy levels, 1 mock/month, all past papers). The natural upgrade moments are Medium unlocking and the 2nd mock in a month. Past papers are never behind a paywall. Each one shows a paywall sheet saying exactly what Pro adds.
 
 **Referral:** each user has a code. When a friend buys Pro with it, the referrer gets +1 month of Pro (max 6 months/year) and the friend gets ₹20 off (Settings).
 
@@ -32,27 +32,29 @@ All prices and limits live in `settings` (editable in the Command Center). The s
 
 ## 3. Payments
 
-### 3.1 Web (and iPhone users via the web app) — Razorpay
+### 3.1 Website — Razorpay
+The checkout page is in **Bubbl Web**. Orders, verification, webhook and entitlements are on the **Bubbl Mobile backend**. Use Emergent's built-in Razorpay connector where it fits these rules.
 - Razorpay **Orders API**: the server creates the order (amount from Settings, `receipt` = user id); the client opens Razorpay Checkout (UPI, cards, netbanking, wallets).
 - **Verify on the server**:
   - checkout callback: payment signature (HMAC-SHA256 with the key secret)
   - the **webhook** (`payment.captured`, `refund.processed`): its signature, with the webhook secret
 - The entitlement is created only by a verified webhook or a verified callback, and is idempotent per `payment_id`.
 - Keys from env: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`. Use **test mode** keys until launch.
-- Razorpay needs a live website with Terms, Privacy, Refund and Contact pages before activation (built in M6).
+- Razorpay needs a live website with Terms, Privacy, Refund and Contact pages before activation. A static site at bubblprep.in provides them until Bubbl Web goes live. Keep the same paths: `/terms`, `/privacy`, `/refund`, `/contact`, `/delete-account`.
 
 ### 3.2 Android app — Google Play Billing
 - Google Play requires Play's billing system (or its India "alternative billing" programme) for digital content sold **inside** the Android app. Use **Play Billing** for the Pro pass.
-- Implement with **RevenueCat** (`react-native-purchases`, works with Expo dev builds / EAS). Product: one-time in-app product `pro_pass_12m` at ₹149.
+- Implement with **RevenueCat** (`react-native-purchases`), using Emergent's built-in connector. Product: one-time in-app product `pro_pass_12m` at ₹149.
 - RevenueCat webhook → our server → entitlement `source: play`.
 - Inside the Android app, **do not link or point to the web checkout** (Play policy). Users who bought on the web simply sign in, and Pro is recognised (entitlement is server-side).
-- Testing needs an EAS development build + Play Console internal testing track (Emergent's Expo preview cannot test real billing). Keep a server-side "fake purchase" endpoint for preview/testing, enabled only when `APP_ENV != production`.
+- Testing needs an Android build from Emergent's Publish panel + Play Console internal testing track (Emergent's preview cannot test real billing). Keep a server-side "fake purchase" endpoint for preview/testing, enabled only when `APP_ENV != production`.
 
 ### 3.3 Invoices
 - Email a simple receipt after every purchase (amount, date, plan, validity, payment id).
 - GST is not charged at launch (owner not GST-registered yet). Settings gets a `gst_enabled` flag and GSTIN field for later.
 
-## 4. Coaching-centre licences
+## 4. Coaching-centre licences (**after launch**)
+At launch, centres get free Pro through 100%-off codes (`source: coupon`). Everything below ships after launch; design the data so it can be added without a rewrite.
 
 ### 4.1 Tiers (yearly, owner-editable)
 | Tier | Seats | Price / year | Per student |

@@ -1,7 +1,7 @@
 # Brand and UI Guide
 
 ## 1. Name and idea
-- **Name:** **Bubbl** (all lowercase in the logo: `bubbl`). Store title: **"Bubbl: OCS & OPSC Exam Practice"**.
+- **Name:** **Bubbl** (all lowercase in the logo: `bubbl`). Store title: **"Bubbl: OCS & OPSC Exam Prep"** (27 characters; Play allows 30).
 - **Idea:** the OMR answer sheet. Every aspirant has spent hours darkening bubbles with a blue or black ball pen. Bubbl turns that ritual into daily practice. Tagline: **"Fill the right bubble."** Odia tagline: **"ଠିକ୍ ବବଲ୍ ଭରନ୍ତୁ।"** (owner to confirm the Odia wording).
 - **Nostalgia cues:**
   - chalkboard green (every classroom)
@@ -35,7 +35,7 @@ Rules:
 ## 3. Type
 - **Headings / numbers:** *Baloo Bhaina 2* (Google Fonts). It covers **Odia and Latin** in one family and has a friendly, rounded, Indian-designed feel. Weights 600/700.
 - **Body / questions:** *Noto Sans* + *Noto Sans Oriya* (Google Fonts), 16–17 px question text, line-height 1.5. Questions must be very readable; no decorative fonts in question text.
-- Never set Odia in a font without Odia glyphs (no tofu boxes). Load fonts with `expo-font`.
+- Never set Odia in a font without Odia glyphs (no tofu boxes). Load fonts with `expo-font` from `Fonts/` (static files for React Native; licences included).
 
 ## 4. Signature UI elements
 - **OMR answer options:** each option starts with a circle labelled A/B/C/D. Tapping fills the circle in `omr` with a quick "ink fill" animation (150 ms). This is the brand moment; keep it consistent everywhere.
@@ -48,12 +48,16 @@ Rules:
 ## 5. Logo and icon (files in `Brand Assets/`)
 - `logo-wordmark.svg`: "bubbl" in Baloo-style rounded type. The bowl of the final **b** is a filled OMR coral bubble.
 - `app-icon-1024.png` / `app-icon.svg`: board-green rounded square with a row of four OMR bubbles labelled A B C D, **B** filled coral (B for Bubbl).
-- `adaptive-icon-foreground.png` (Android), `favicon.png`, `splash.png`, `play-feature-graphic-1024x500.png`.
+- **Android:** `adaptive-icon-foreground.png`, `adaptive-icon-background.png`, `adaptive-icon-monochrome.png`, `notification-icon.png` (white on transparent).
+- **Splash:** `splash-icon.png` (transparent, on background `#1E4D3B`), or `splash.png` (full 1284×2778).
+- **Web (Bubbl Web):** `favicon-32.png`, `favicon-48.png`, `favicon.png`, `apple-touch-icon-180.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `share-image-1200x630.png`.
+- **Store:** `play-icon-512.png`, `play-feature-graphic-1024x500.png`.
+- **Share card:** `result-card-reference.png` shows the layout; render it in the app with real values.
 
 ## 6. Voice and tone
 - Like a senior who cleared the exam: direct, warm, a little playful, never childish.
 - Short sentences. Encourage, never shame ("7/10 — two away from Medium!" not "You failed").
-- English UI with full Odia translation. Odia strings come from a single `i18n/or.json` that the owner reviews.
+- English UI with full Odia translation. All text comes from `App Text/en.json` and `App Text/or.json` (same keys). Copy them into the app's `i18n/`. The owner reviews the Odia, so never hard-code or machine-translate strings; add new keys to both files and tell the owner.
 - Avoid: "guaranteed selection", fake urgency, fake "MRP" strike-throughs, unverifiable claims ("10 lakh students").
 
 ## 7. Accessibility
